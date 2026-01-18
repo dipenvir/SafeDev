@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ExternalLink,
   ScanSearch,
-  ShieldCheck,
   CheckCircle2,
   AlertTriangle,
   ChevronDown,
@@ -51,7 +50,7 @@ function statusMeta(scanResult?: ScanResult) {
     return {
       label: "Ready to scan",
       tone: "border-white/10 bg-white/[0.04] text-white/75 ring-white/10" as const,
-      icon: ShieldCheck,
+      icon: ScanSearch,
     };
   }
 
@@ -72,9 +71,10 @@ function statusMeta(scanResult?: ScanResult) {
       icon: AlertTriangle,
     };
   }
+  console.log(s, scanResult.issuesFound)
 
   if (
-    (s.includes("done") || s.includes("complete") || s.includes("success")) &&
+    (s.includes("done") || s.includes("complete") || s.includes("success") ||  s.includes("clean")) &&
     scanResult.issuesFound === 0
   ) {
     return {
@@ -93,7 +93,6 @@ function statusMeta(scanResult?: ScanResult) {
 
 export default function GitHubRepoCard({
   name,
-  owner,
   description,
   html_url,
   onScan,

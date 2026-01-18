@@ -67,8 +67,8 @@ function StatusPill({ result }: { result?: ScanResult }) {
   if (!result) {
     return (
       <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
-        <Sparkles className="h-3.5 w-3.5 text-indigo-200" />
-        Ready
+        <Search className="h-3.5 w-3.5 text-indigo-200" />
+        Ready to scan
       </span>
     );
   }
@@ -425,7 +425,12 @@ export default function GitHubPage() {
                   <ShieldCheck className="h-4 w-4 text-indigo-200" />
                   Issues Found
                 </div>
-                <div className="mt-2 text-2xl font-bold">{totalStats.totalIssues}</div>
+                <div className={`mt-2 text-2xl font-bold flex items-center gap-2 ${totalStats.totalIssues === 0 && totalStats.completedScans > 0 ? 'text-emerald-400' : ''}`}>
+                  {totalStats.totalIssues === 0 && totalStats.completedScans > 0 && (
+                    <CheckCircle2 className="h-5 w-5" />
+                  )}
+                  {totalStats.totalIssues}
+                </div>
               </div>
             </motion.div>
           </motion.div>
