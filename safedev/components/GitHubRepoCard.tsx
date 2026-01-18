@@ -20,6 +20,26 @@ interface GitHubRepoCardProps {
   scanResult?: { status: string; issuesFound: number; details: any[] };
 }
 
+function getSeverity(issues: string[]) {
+  if (
+    issues.some((x) =>
+      /(AWS Access Key|GitHub Personal Access Token|JWT Secret|Secret key)/i.test(x)
+    )
+  ) {
+    return "high";
+  }
+
+  if (
+    issues.some((x) =>
+      /(Privileged mode|latest tag|Debug mode)/i.test(x)
+    )
+  ) {
+    return "warning";
+  }
+
+  return "good";
+}
+
 const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 function statusMeta(scanResult?: {
@@ -30,8 +50,7 @@ function statusMeta(scanResult?: {
   if (!scanResult) {
     return {
       label: "Ready to scan",
-      tone:
-        "border-white/10 bg-white/[0.04] text-white/75 ring-white/10" as const,
+      tone: "border-white/10 bg-white/[0.04] text-white/75 ring-white/10" as const,
       icon: ShieldCheck,
     };
   }
@@ -41,8 +60,7 @@ function statusMeta(scanResult?: {
   if (s.includes("scan")) {
     return {
       label: "Scanning…",
-      tone:
-        "border-indigo-400/20 bg-indigo-500/10 text-indigo-200 ring-indigo-400/20" as const,
+      tone: "border-indigo-400/20 bg-indigo-500/10 text-indigo-200 ring-indigo-400/20" as const,
       icon: ScanSearch,
     };
   }
@@ -50,8 +68,7 @@ function statusMeta(scanResult?: {
   if (s.includes("error") || s.includes("fail")) {
     return {
       label: "Scan error",
-      tone:
-        "border-rose-400/25 bg-rose-500/10 text-rose-200 ring-rose-400/25" as const,
+      tone: "border-rose-400/25 bg-rose-500/10 text-rose-200 ring-rose-400/25" as const,
       icon: AlertTriangle,
     };
   }
@@ -62,18 +79,14 @@ function statusMeta(scanResult?: {
   ) {
     return {
       label: "No issues found",
-      tone:
-        "border-emerald-400/25 bg-emerald-500/10 text-emerald-200 ring-emerald-400/25" as const,
+      tone: "border-emerald-400/25 bg-emerald-500/10 text-emerald-200 ring-emerald-400/25" as const,
       icon: CheckCircle2,
     };
   }
 
   return {
-    label: `${scanResult.issuesFound} issue${
-      scanResult.issuesFound === 1 ? "" : "s"
-    } found`,
-    tone:
-      "border-amber-400/25 bg-amber-500/10 text-amber-200 ring-amber-400/25" as const,
+    label: `${scanResult.issuesFound} issue${scanResult.issuesFound === 1 ? "" : "s"} found`,
+    tone: "border-amber-400/25 bg-amber-500/10 text-amber-200 ring-amber-400/25" as const,
     icon: AlertTriangle,
   };
 }
@@ -120,7 +133,7 @@ export default function GitHubRepoCard({
               </span>
 
               <div className="min-w-0">
-                <div className="flexflex items-center gap-2">
+                <div className="flex items-center gap-2">
                   <a
                     href={html_url}
                     target="_blank"
@@ -158,9 +171,7 @@ export default function GitHubRepoCard({
                 meta.tone,
               ].join(" ")}
             >
-              <Icon
-                className={`h-3.5 w-3.5 ${isScanning ? "animate-pulse" : ""}`}
-              />
+              <Icon className={`h-3.5 w-3.5 ${isScanning ? "animate-pulse" : ""}`} />
               {meta.label}
             </span>
 
@@ -211,28 +222,43 @@ export default function GitHubRepoCard({
                 </div>
 
                 <ul className="mt-3 space-y-3">
-                  {scanResult!.details.map((d: any, idx: number) => (
-                    <li
-                      key={d.file ?? idx}
-                      className="rounded-xl border border-white/10 bg-white/[0.03] p-3"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-semibold text-white">
-                            {d.file}
-                          </p>
-                          <p className="mt-1 text-xs text-white/60">
-                            {(d.issues || []).join(", ")}
-                          </p>
-                        </div>
+                  {scanResult!.details.map((d: any, idx: number) => {
+                    const severity = getSeverity(d.issues || []);
+                    return (
+                      <li
+                        key={d.file ?? idx}
+                        className="rounded-xl border border-white/10 bg-white/[0.03] p-3"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold text-white">
+                              {d.file}
+                            </p>
+                            <p className="mt-1 text-xs text-white/60">
+                              {(d.issues || []).join(", ")}
+                            </p>
+                          </div>
 
-                        <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-400/25 bg-amber-500/10 px-2 py-1 text-xs font-semibold text-amber-200">
-                          <AlertTriangle className="h-3.5 w-3.5" />
-                          Risk
-                        </span>
-                      </div>
-                    </li>
-                  ))}
+                          <span
+                            className={[
+                              "inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-1 text-xs font-semibold",
+                              severity === "high"
+                                ? "border-rose-400/25 bg-rose-500/10 text-rose-200"
+                                : severity === "warning"
+                                ? "border-amber-400/25 bg-amber-500/10 text-amber-200"
+                                : "border-emerald-400/25 bg-emerald-500/10 text-emerald-200",
+                            ].join(" ")}
+                          >
+                            {severity === "high"
+                              ? "High"
+                              : severity === "warning"
+                              ? "Warning"
+                              : "Good"}
+                          </span>
+                        </div>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             </motion.div>
