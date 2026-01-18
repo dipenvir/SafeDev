@@ -14,7 +14,6 @@ import {
     ShieldCheck,
     Sparkles,
 } from "lucide-react";
-import Footer from "../../../components/Footer";
 
 type FeatureKey = "jwt-inspector" | "github-scanner" | "security-advisor";
 
@@ -63,7 +62,7 @@ const ICONS = {
 
 function Pill({ text }: { text: string }) {
     return (
-        <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-sm text-white/80 backdrop-blur">
+        <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80 backdrop-blur">
             <CheckCircle2 className="h-4 w-4 text-indigo-200" />
             {text}
         </div>
@@ -72,7 +71,7 @@ function Pill({ text }: { text: string }) {
 
 function Stat({ label, value }: { label: string; value: string }) {
     return (
-        <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur">
+        <div className="rounded-2xl border border-white/10 bg-white/4 p-5 backdrop-blur">
             <div className="text-xs font-semibold tracking-wide text-white/60">
                 {label}
             </div>
@@ -104,17 +103,17 @@ export default function FeatureClient({
                     transition={{ duration: 0.8, ease: EASE_OUT }}
                 >
                     <motion.div
-                        className="absolute -top-40 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-indigo-500/25 blur-3xl"
+                        className="absolute -top-40 left-1/2 h-130 w-130 -translate-x-1/2 rounded-full bg-indigo-500/25 blur-3xl"
                         animate={{ y: [0, 18, 0], scale: [1, 1.05, 1] }}
                         transition={{ duration: 8, repeat: Infinity, ease: EASE_IN_OUT }}
                     />
                     <motion.div
-                        className="absolute -bottom-56 -left-24 h-[520px] w-[520px] rounded-full bg-fuchsia-500/20 blur-3xl"
+                        className="absolute -bottom-56 -left-24 h-130 w-130 rounded-full bg-fuchsia-500/20 blur-3xl"
                         animate={{ x: [0, 16, 0], scale: [1, 1.05, 1] }}
                         transition={{ duration: 10, repeat: Infinity, ease: EASE_IN_OUT }}
                     />
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.18),transparent_55%),radial-gradient(ellipse_at_bottom,rgba(217,70,239,0.14),transparent_55%)]" />
-                    <div className="absolute inset-0 opacity-[0.10] [background-image:linear-gradient(to_right,rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:56px_56px]" />
+                    <div className="absolute inset-0 opacity-[0.10] bg-[linear-gradient(to_right,rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.12)_1px,transparent_1px)] bg-size-[56px_56px]" />
                 </motion.div>
 
                 <div className="relative mx-auto max-w-6xl px-6 py-20 md:py-24">
@@ -131,14 +130,14 @@ export default function FeatureClient({
 
                         <motion.div
                             variants={fadeUp}
-                            className="mt-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-sm text-white/80 backdrop-blur"
+                            className="mt-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80 backdrop-blur"
                         >
                             <Sparkles className="h-4 w-4 text-indigo-200" />
                             SafeDev Feature
                         </motion.div>
 
                         <motion.div variants={fadeUp} className="mt-6 flex items-center gap-4">
-                            <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur">
+                            <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/5 backdrop-blur">
                                 <Icon className="h-7 w-7 text-indigo-200" />
                             </div>
                             <div>
@@ -168,7 +167,7 @@ export default function FeatureClient({
 
                             <a
                                 href="#details"
-                                className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/[0.05] px-6 py-3 text-sm font-semibold text-white/80 backdrop-blur transition hover:bg-white/[0.08]"
+                                className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white/80 backdrop-blur transition hover:bg-white/8"
                             >
                                 See Details
                             </a>
@@ -215,7 +214,7 @@ export default function FeatureClient({
                                 <motion.div
                                     key={sec.title}
                                     variants={fadeUp}
-                                    className="rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur"
+                                    className="rounded-2xl border border-white/10 bg-white/4 p-6 backdrop-blur"
                                 >
                                     <h4 className="text-lg font-semibold text-white">{sec.title}</h4>
                                     <ul className="mt-3 space-y-2 text-sm leading-6 text-white/70">
@@ -241,7 +240,7 @@ export default function FeatureClient({
                                     <motion.div
                                         key={s.title}
                                         variants={fadeUp}
-                                        className="rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur"
+                                        className="rounded-2xl border border-white/10 bg-white/4 p-6 backdrop-blur"
                                     >
                                         <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600/90 text-white">
                                             <StepIcon className="h-5 w-5" />
@@ -316,8 +315,6 @@ export default function FeatureClient({
                     </motion.div>
                 </div>
             </section>
-
-            <Footer />
         </div>
     );
 }

@@ -1,4 +1,3 @@
-// /app/github/page.tsx
 "use client";
 
 import { useSession, signIn, signOut } from "next-auth/react";
@@ -7,7 +6,6 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Variants } from "framer-motion";
 import {
-  Github,
   LogOut,
   Search,
   ShieldCheck,
@@ -19,7 +17,8 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import GitHubRepoCard from "../../components/GitHubRepoCard";
-import Footer from "../../components/Footer";
+import GithubIcon from "../../components/GithubIcon";
+import type { ScanResult } from "../../lib/types";
 
 interface Repo {
   id: number;
@@ -27,8 +26,6 @@ interface Repo {
   description: string | null;
   html_url: string;
 }
-
-type ScanResult = { status: string; issuesFound: number; details: any[] };
 
 const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const EASE_IN_OUT: [number, number, number, number] = [0.42, 0, 0.58, 1];
@@ -51,7 +48,7 @@ const fadeUp: Variants = {
 function StatusPill({ result }: { result?: ScanResult }) {
   if (!result) {
     return (
-      <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-xs text-white/70">
+      <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
         <Sparkles className="h-3.5 w-3.5 text-indigo-200" />
         Ready
       </span>
@@ -68,7 +65,7 @@ function StatusPill({ result }: { result?: ScanResult }) {
 
   if (scanning) {
     return (
-      <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-xs text-white/70">
+      <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
         <Loader2 className="h-3.5 w-3.5 animate-spin text-indigo-200" />
         Scanning…
       </span>
@@ -113,13 +110,20 @@ export default function GitHubPage() {
   useEffect(() => {
     if (!session?.accessToken) return;
 
-    setLoading(true);
-    fetch("https://api.github.com/user/repos?per_page=100&sort=updated", {
-      headers: { Authorization: `token ${session.accessToken}` },
-    })
-      .then((res) => res.json())
-      .then((data) => setRepos(Array.isArray(data) ? data : []))
-      .finally(() => setLoading(false));
+    const fetchRepos = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch("https://api.github.com/user/repos?per_page=100&sort=updated", {
+          headers: { Authorization: `token ${session.accessToken}` },
+        });
+        const data = await res.json();
+        setRepos(Array.isArray(data) ? data : []);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRepos();
   }, [session]);
 
   const filtered = useMemo(() => {
@@ -168,17 +172,17 @@ export default function GitHubPage() {
           transition={{ duration: 0.7, ease: EASE_OUT }}
         >
           <motion.div
-            className="absolute -top-40 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-indigo-500/25 blur-3xl"
+            className="absolute -top-40 left-1/2 h-130 w-130 -translate-x-1/2 rounded-full bg-indigo-500/25 blur-3xl"
             animate={{ y: [0, 18, 0], scale: [1, 1.05, 1] }}
             transition={{ duration: 8, repeat: Infinity, ease: EASE_IN_OUT }}
           />
           <motion.div
-            className="absolute -bottom-56 -left-24 h-[520px] w-[520px] rounded-full bg-fuchsia-500/20 blur-3xl"
+            className="absolute -bottom-56 -left-24 h-130 w-130 rounded-full bg-fuchsia-500/20 blur-3xl"
             animate={{ x: [0, 16, 0], scale: [1, 1.05, 1] }}
             transition={{ duration: 10, repeat: Infinity, ease: EASE_IN_OUT }}
           />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.18),transparent_55%),radial-gradient(ellipse_at_bottom,rgba(217,70,239,0.14),transparent_55%)]" />
-          <div className="absolute inset-0 opacity-[0.10] [background-image:linear-gradient(to_right,rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:56px_56px]" />
+          <div className="absolute inset-0 opacity-[0.10] bg-[linear-gradient(to_right,rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.12)_1px,transparent_1px)] bg-size-[56px_56px]" />
         </motion.div>
 
         <div className="relative mx-auto max-w-6xl px-6 pb-10 pt-16 md:pb-12 md:pt-20">
@@ -188,8 +192,8 @@ export default function GitHubPage() {
               className="flex items-center justify-between gap-4"
             >
               <div className="flex items-center gap-3">
-                <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur">
-                  <Github className="h-6 w-6 text-indigo-200" />
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 backdrop-blur">
+                  <GithubIcon className="h-6 w-6 text-indigo-200" />
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
@@ -205,7 +209,7 @@ export default function GitHubPage() {
               <div className="hidden sm:flex items-center gap-2">
                 <Link
                   href="/about#features"
-                  className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.05] px-4 py-2 text-sm font-semibold text-white/80 backdrop-blur transition hover:bg-white/[0.08]"
+                  className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 backdrop-blur transition hover:bg-white/8"
                 >
                   Learn more <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -216,7 +220,7 @@ export default function GitHubPage() {
               variants={fadeUp}
               className="mt-8 grid gap-4 md:grid-cols-3"
             >
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur">
+              <div className="rounded-2xl border border-white/10 bg-white/4 p-5 backdrop-blur">
                 <div className="flex items-center gap-2 text-xs font-semibold text-white/60">
                   <FolderGit2 className="h-4 w-4 text-indigo-200" />
                   Repositories
@@ -224,14 +228,14 @@ export default function GitHubPage() {
                 <div className="mt-2 text-2xl font-bold">{repos.length}</div>
               </div>
 
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur">
+              <div className="rounded-2xl border border-white/10 bg-white/4 p-5 backdrop-blur">
                 <div className="text-xs font-semibold text-white/60">Scans</div>
                 <div className="mt-2 text-2xl font-bold">
                   {Object.keys(scanResults).length}
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur">
+              <div className="rounded-2xl border border-white/10 bg-white/4 p-5 backdrop-blur">
                 <div className="text-xs font-semibold text-white/60">Status</div>
                 <div className="mt-2">
                   <StatusPill
@@ -261,9 +265,9 @@ export default function GitHubPage() {
                 transition={{ duration: 0.45, ease: EASE_OUT }}
                 className="mx-auto max-w-2xl"
               >
-                <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-10 text-center backdrop-blur-xl">
-                  <div className="mx-auto inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05] text-white backdrop-blur">
-                    <Github className="h-7 w-7 text-indigo-200" />
+                <div className="rounded-3xl border border-white/10 bg-white/3 p-10 text-center backdrop-blur-xl">
+                  <div className="mx-auto inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white backdrop-blur">
+                    <GithubIcon className="h-7 w-7 text-indigo-200" />
                   </div>
 
                   <h2 className="mt-6 text-3xl font-bold">Connect GitHub</h2>
@@ -277,7 +281,7 @@ export default function GitHubPage() {
                       onClick={() => signIn("github")}
                       className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-[#070A12] transition hover:bg-white/90"
                     >
-                      <Github className="h-4 w-4" />
+                      <GithubIcon className="h-4 w-4" />
                       Sign in with GitHub
                     </button>
                   </div>
@@ -300,7 +304,7 @@ export default function GitHubPage() {
                   variants={fadeUp}
                   className="
                     flex flex-col gap-4 rounded-3xl border border-white/10
-                    bg-white/[0.03] p-6 backdrop-blur-xl
+                    bg-white/3 p-6 backdrop-blur-xl
                     md:flex-row md:items-center md:justify-between
                   "
                 >
@@ -322,7 +326,7 @@ export default function GitHubPage() {
                         placeholder="Search repos..."
                         className="
                           h-11 w-full rounded-xl border border-white/10
-                          bg-white/[0.03] pl-9 pr-4 text-sm text-white
+                          bg-white/3 pl-9 pr-4 text-sm text-white
                           outline-none backdrop-blur
                           transition focus:border-indigo-400/40 focus:ring-4 focus:ring-indigo-500/20
                           placeholder:text-white/40
@@ -337,7 +341,7 @@ export default function GitHubPage() {
                         inline-flex h-11 items-center justify-center gap-2 rounded-xl
                         border border-white/10 bg-red-500 px-4
                         text-sm font-semibold text-white/80
-                        backdrop-blur transition hover:bg-white/[0.06]
+                        backdrop-blur transition hover:bg-white/6
                       "
                     >
                       <LogOut className="h-4 w-4" />
@@ -348,21 +352,21 @@ export default function GitHubPage() {
 
                 <motion.div variants={fadeUp} className="space-y-4">
                   {loading ? (
-                    <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-8 text-center backdrop-blur-xl">
+                    <div className="rounded-3xl border border-white/10 bg-white/3 p-8 text-center backdrop-blur-xl">
                       <div className="mx-auto flex w-fit items-center gap-2 text-white/80">
                         <Loader2 className="h-5 w-5 animate-spin" />
                         Loading repositories…
                       </div>
                     </div>
                   ) : filtered.length === 0 ? (
-                    <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-8 text-center backdrop-blur-xl">
+                    <div className="rounded-3xl border border-white/10 bg-white/3 p-8 text-center backdrop-blur-xl">
                       <p className="text-white/80">
                         No repositories found{query ? " for that search." : "."}
                       </p>
                       {query ? (
                         <button
                           onClick={() => setQuery("")}
-                          className="mt-4 inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2 text-sm font-semibold text-white/80 hover:bg-white/[0.06]"
+                          className="mt-4 inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/3 px-4 py-2 text-sm font-semibold text-white/80 hover:bg-white/6"
                         >
                           Clear search
                         </button>
@@ -382,7 +386,7 @@ export default function GitHubPage() {
                           }}
                           className="
                             rounded-3xl border border-white/10
-                            bg-white/[0.02] p-5 backdrop-blur-xl
+                            bg-white/2 p-5 backdrop-blur-xl
                           "
                         >
                           <div className="mb-4 flex items-center justify-between gap-3">
@@ -411,9 +415,9 @@ export default function GitHubPage() {
                                 rel="noreferrer"
                                 className="
                                   hidden sm:inline-flex h-9 items-center justify-center
-                                  rounded-xl border border-white/10 bg-white/[0.03] px-3
+                                  rounded-xl border border-white/10 bg-white/3 px-3
                                   text-sm font-semibold text-white/80
-                                  backdrop-blur transition hover:bg-white/[0.06]
+                                  backdrop-blur transition hover:bg-white/6
                                 "
                               >
                                 View
@@ -439,8 +443,6 @@ export default function GitHubPage() {
           </AnimatePresence>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

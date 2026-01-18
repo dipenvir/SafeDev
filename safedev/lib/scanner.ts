@@ -1,8 +1,6 @@
 // /lib/scanner.ts
-export interface ScanIssue {
-  file: string;
-  issues: string[];
-}
+import type { ScanIssue } from "./types";
+export type { ScanIssue };
 
 type GithubContentsItem = {
   type: "file" | "dir" | "submodule" | "symlink";

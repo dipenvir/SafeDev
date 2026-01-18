@@ -3,7 +3,6 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Github,
   ExternalLink,
   ScanSearch,
   ShieldCheck,
@@ -11,13 +10,15 @@ import {
   AlertTriangle,
   ChevronDown,
 } from "lucide-react";
+import GithubIcon from "./GithubIcon";
+import type { ScanResult } from "../lib/types";
 
 interface GitHubRepoCardProps {
   name: string;
   description: string | null;
   html_url: string;
   onScan: () => void;
-  scanResult?: { status: string; issuesFound: number; details: any[] };
+  scanResult?: ScanResult;
 }
 
 function getSeverity(issues: string[]) {
@@ -42,11 +43,7 @@ function getSeverity(issues: string[]) {
 
 const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
-function statusMeta(scanResult?: {
-  status: string;
-  issuesFound: number;
-  details: any[];
-}) {
+function statusMeta(scanResult?: ScanResult) {
   if (!scanResult) {
     return {
       label: "Ready to scan",
@@ -111,7 +108,7 @@ export default function GitHubRepoCard({
       className="
         group relative overflow-hidden rounded-2xl
         border border-white/10
-        bg-white/[0.03] backdrop-blur-xl
+        bg-white/3 backdrop-blur-xl
         p-5
         transition
         hover:border-white/20
@@ -128,8 +125,8 @@ export default function GitHubRepoCard({
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
             <div className="flex items-center gap-3">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-indigo-200">
-                <Github className="h-5 w-5" />
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/4 text-indigo-200">
+                <GithubIcon className="h-5 w-5" />
               </span>
 
               <div className="min-w-0">
@@ -148,7 +145,7 @@ export default function GitHubRepoCard({
                     href={html_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.03] px-2 py-1 text-xs font-semibold text-white/70 hover:bg-white/[0.06]"
+                    className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/3 px-2 py-1 text-xs font-semibold text-white/70 hover:bg-white/6"
                     aria-label="Open on GitHub"
                   >
                     <ExternalLink className="h-3.5 w-3.5" />
@@ -193,7 +190,7 @@ export default function GitHubRepoCard({
               </button>
 
               {hasDetails ? (
-                <span className="inline-flex items-center gap-1 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs font-semibold text-white/70">
+                <span className="inline-flex items-center gap-1 rounded-xl border border-white/10 bg-white/3 px-3 py-2 text-xs font-semibold text-white/70">
                   Details <ChevronDown className="h-4 w-4" />
                 </span>
               ) : null}
@@ -211,7 +208,7 @@ export default function GitHubRepoCard({
               transition={{ duration: 0.25, ease: EASE_OUT }}
               className="mt-5 overflow-hidden"
             >
-              <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+              <div className="rounded-2xl border border-white/10 bg-white/2 p-4">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-semibold text-white">
                     Findings ({scanResult?.issuesFound ?? 0})
@@ -222,12 +219,12 @@ export default function GitHubRepoCard({
                 </div>
 
                 <ul className="mt-3 space-y-3">
-                  {scanResult!.details.map((d: any, idx: number) => {
+                  {scanResult!.details.map((d, idx: number) => {
                     const severity = getSeverity(d.issues || []);
                     return (
                       <li
                         key={d.file ?? idx}
-                        className="rounded-xl border border-white/10 bg-white/[0.03] p-3"
+                        className="rounded-xl border border-white/10 bg-white/3 p-3"
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">

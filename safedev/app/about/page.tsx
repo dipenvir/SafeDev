@@ -1,4 +1,3 @@
-// /app/about/page.tsx
 "use client";
 
 import { motion } from "framer-motion";
@@ -11,10 +10,9 @@ import {
   GitBranch,
   Sparkles,
   ArrowRight,
+  LucideIcon,
 } from "lucide-react";
-import Footer from "../../components/Footer";
 import Link from "next/link";
-
 
 // ✅ Typed easing tuples (fixes TS errors in newer framer-motion types)
 const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
@@ -40,7 +38,7 @@ function Feature({
   title,
   description,
 }: {
-  icon: any;
+  icon: LucideIcon;
   title: string;
   description: string;
 }) {
@@ -49,7 +47,7 @@ function Feature({
       variants={fadeUp}
       whileHover={{ y: -4 }}
       transition={{ type: "spring", stiffness: 260, damping: 20 }}
-      className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl"
+      className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/4 p-6 backdrop-blur-xl"
     >
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <div className="absolute -top-24 -left-24 h-56 w-56 rounded-full bg-indigo-500/20 blur-3xl" />
@@ -57,7 +55,7 @@ function Feature({
       </div>
 
       <div className="relative">
-        <div className="mb-4 inline-flex rounded-xl border border-white/10 bg-white/[0.05] p-3">
+        <div className="mb-4 inline-flex rounded-xl border border-white/10 bg-white/5 p-3">
           <Icon className="h-6 w-6 text-indigo-200" />
         </div>
         <h3 className="text-xl font-semibold text-white">{title}</h3>
@@ -80,7 +78,7 @@ function Step({
   num: string;
   title: string;
   text: string;
-  icon: any;
+  icon: LucideIcon;
 }) {
   return (
     <motion.div
@@ -123,19 +121,19 @@ export default function AboutPage() {
           transition={{ duration: 0.8, ease: EASE_OUT }}
         >
           <motion.div
-            className="absolute -top-40 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-indigo-500/25 blur-3xl"
+            className="absolute -top-40 left-1/2 h-130 w-130 -translate-x-1/2 rounded-full bg-indigo-500/25 blur-3xl"
             animate={{ y: [0, 18, 0], scale: [1, 1.05, 1] }}
             transition={{ duration: 8, repeat: Infinity, ease: EASE_IN_OUT }}
           />
           <motion.div
-            className="absolute -bottom-56 -left-24 h-[520px] w-[520px] rounded-full bg-fuchsia-500/20 blur-3xl"
+            className="absolute -bottom-56 -left-24 h-130 w-130 rounded-full bg-fuchsia-500/20 blur-3xl"
             animate={{ x: [0, 16, 0], scale: [1, 1.05, 1] }}
             transition={{ duration: 10, repeat: Infinity, ease: EASE_IN_OUT }}
           />
 
           {/* Subtle gradient + grid */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.18),transparent_55%),radial-gradient(ellipse_at_bottom,rgba(217,70,239,0.14),transparent_55%)]" />
-          <div className="absolute inset-0 opacity-[0.10] [background-image:linear-gradient(to_right,rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:56px_56px]" />
+          <div className="absolute inset-0 opacity-[0.10] bg-[linear-gradient(to_right,rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.12)_1px,transparent_1px)] bg-size-[56px_56px]" />
         </motion.div>
 
         <div className="relative mx-auto max-w-6xl px-6 py-28 md:py-32">
@@ -147,7 +145,7 @@ export default function AboutPage() {
           >
             <motion.div
               variants={fadeUp}
-              className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-sm text-white/80 backdrop-blur"
+              className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80 backdrop-blur"
             >
               <Sparkles className="h-4 w-4 text-indigo-200" />
               SafeDev — Developer-first security
@@ -158,7 +156,7 @@ export default function AboutPage() {
               className="text-balance text-5xl font-bold tracking-tight md:text-6xl"
             >
               Secure your code and tokens with{" "}
-              <span className="bg-gradient-to-r from-indigo-200 via-white to-fuchsia-200 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-indigo-200 via-white to-fuchsia-200 bg-clip-text text-transparent">
                 SafeDev
               </span>
             </motion.h1>
@@ -185,7 +183,7 @@ export default function AboutPage() {
 
               <a
                 href="#features"
-                className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/[0.05] px-6 py-3 text-sm font-semibold text-white/80 backdrop-blur transition hover:bg-white/[0.08]"
+                className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white/80 backdrop-blur transition hover:bg-white/8"
               >
                 View Features
               </a>
@@ -202,7 +200,7 @@ export default function AboutPage() {
               ].map((it, i) => (
                 <div
                   key={i}
-                  className="flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white/70 backdrop-blur"
+                  className="flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/3 px-4 py-3 text-sm text-white/70 backdrop-blur"
                 >
                   <it.icon className="h-4 w-4 text-indigo-200" />
                   {it.label}
@@ -233,7 +231,8 @@ export default function AboutPage() {
               variants={fadeUp}
               className="mx-auto mt-4 max-w-2xl text-center text-white/65"
             >
-              Built for developers who want clarity, speed, and practical next steps.
+              Built for developers who want clarity, speed, and practical next
+              steps.
             </motion.p>
 
             <div className="mt-12 grid gap-8 md:grid-cols-3">
@@ -264,7 +263,6 @@ export default function AboutPage() {
           </motion.div>
         </div>
       </section>
-
 
       {/* HOW IT WORKS */}
       <section className="bg-gray-50 py-20">
@@ -360,8 +358,6 @@ export default function AboutPage() {
           </motion.div>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 }

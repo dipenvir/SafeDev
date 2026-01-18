@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { scanRepo } from "../../../../lib/scanner";
+import type { ScanResult } from "../../../../lib/types";
 
 export async function POST(req: Request) {
   try {
@@ -12,20 +13,24 @@ export async function POST(req: Request) {
     const user = await userRes.json();
     
     if (!user.login) {
-      return NextResponse.json({ status: "Error", issuesFound: 0, details: [], error: "Failed to get user info" }, { status: 400 });
+      const errorResponse: ScanResult = { status: "Error", issuesFound: 0, details: [], error: "Failed to get user info" };
+      return NextResponse.json(errorResponse, { status: 400 });
     }
 
     const repoUrl = `https://github.com/${user.login}/${repoName}`;
     const results = await scanRepo(repoUrl, accessToken);
 
-    return NextResponse.json({
+    const response: ScanResult = {
       repoName,
       status: results.length > 0 ? "Issues Found" : "Clean",
       issuesFound: results.length,
       details: results,
-    });
+    };
+
+    return NextResponse.json(response);
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ status: "Error", issuesFound: 0, details: [] });
+    const errorResponse: ScanResult = { status: "Error", issuesFound: 0, details: [] };
+    return NextResponse.json(errorResponse);
   }
 }
