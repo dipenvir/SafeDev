@@ -16,6 +16,8 @@ import {
   CheckCircle2,
   AlertTriangle,
   FileCode,
+  Clock,
+  Files,
 } from "lucide-react";
 import GitHubRepoCard from "../../components/GitHubRepoCard";
 import GithubIcon from "../../components/GithubIcon";
@@ -46,6 +48,15 @@ const fadeUp: Variants = {
     transition: { duration: 0.55, ease: EASE_OUT },
   },
 };
+
+function formatDuration(ms: number): string {
+  if (ms < 1000) return `${ms}ms`;
+  const seconds = ms / 1000;
+  if (seconds < 60) return `${seconds.toFixed(1)}s`;
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = (seconds % 60).toFixed(0);
+  return `${minutes}m ${remainingSeconds}s`;
+}
 
 function StatusPill({ result }: { result?: ScanResult }) {
   if (!result) {
@@ -95,18 +106,45 @@ function StatusPill({ result }: { result?: ScanResult }) {
 
   if (ok && result.issuesFound === 0) {
     return (
-      <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-100">
-        <CheckCircle2 className="h-3.5 w-3.5" />
-        Clean {result.filesScanned ? `(${result.filesScanned} files)` : ""}
-      </span>
+      <div className="flex flex-col items-end gap-1">
+        <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-100">
+          <CheckCircle2 className="h-3.5 w-3.5" />
+          Clean
+        </span>
+        <ScanStats filesScanned={result.filesScanned} durationMs={result.durationMs} />
+      </div>
     );
   }
 
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-amber-400/20 bg-amber-500/10 px-3 py-1 text-xs text-amber-100">
-      <ShieldCheck className="h-3.5 w-3.5" />
-      {result.issuesFound} issue{result.issuesFound === 1 ? "" : "s"}
-    </span>
+    <div className="flex flex-col items-end gap-1">
+      <span className="inline-flex items-center gap-2 rounded-full border border-amber-400/20 bg-amber-500/10 px-3 py-1 text-xs text-amber-100">
+        <ShieldCheck className="h-3.5 w-3.5" />
+        {result.issuesFound} issue{result.issuesFound === 1 ? "" : "s"}
+      </span>
+      <ScanStats filesScanned={result.filesScanned} durationMs={result.durationMs} />
+    </div>
+  );
+}
+
+function ScanStats({ filesScanned, durationMs }: { filesScanned?: number; durationMs?: number }) {
+  if (!filesScanned && !durationMs) return null;
+
+  return (
+    <div className="flex items-center gap-3 text-[10px] text-white/50">
+      {filesScanned !== undefined && (
+        <span className="inline-flex items-center gap-1">
+          <Files className="h-3 w-3" />
+          {filesScanned} files
+        </span>
+      )}
+      {durationMs !== undefined && (
+        <span className="inline-flex items-center gap-1">
+          <Clock className="h-3 w-3" />
+          {formatDuration(durationMs)}
+        </span>
+      )}
+    </div>
   );
 }
 
@@ -150,6 +188,17 @@ export default function GitHubPage() {
     if (!q) return repos;
     return repos.filter((r) => r.name.toLowerCase().includes(q));
   }, [repos, query]);
+
+  // Calculate total stats
+  const totalStats = useMemo(() => {
+    const completedScans = Object.values(scanResults).filter(
+      (r) => r.status && !r.status.toLowerCase().includes("scan")
+    );
+    const totalFiles = completedScans.reduce((sum, r) => sum + (r.filesScanned || 0), 0);
+    const totalDuration = completedScans.reduce((sum, r) => sum + (r.durationMs || 0), 0);
+    const totalIssues = completedScans.reduce((sum, r) => sum + (r.issuesFound || 0), 0);
+    return { totalFiles, totalDuration, totalIssues, completedScans: completedScans.length };
+  }, [scanResults]);
 
   const handleScan = useCallback(async (repoName: string) => {
     if (!session?.accessToken) return;
@@ -219,6 +268,7 @@ export default function GitHubPage() {
                   issuesFound: event.totalIssues,
                   details: [...collectedIssues],
                   filesScanned: event.totalFiles,
+                  durationMs: event.durationMs,
                   currentFile: undefined,
                 },
               }));
@@ -337,7 +387,7 @@ export default function GitHubPage() {
 
             <motion.div
               variants={fadeUp}
-              className="mt-8 grid gap-4 md:grid-cols-3"
+              className="mt-8 grid gap-4 md:grid-cols-4"
             >
               <div className="rounded-2xl border border-white/10 bg-white/4 p-5 backdrop-blur">
                 <div className="flex items-center gap-2 text-xs font-semibold text-white/60">
@@ -348,23 +398,29 @@ export default function GitHubPage() {
               </div>
 
               <div className="rounded-2xl border border-white/10 bg-white/4 p-5 backdrop-blur">
-                <div className="text-xs font-semibold text-white/60">Scans</div>
+                <div className="flex items-center gap-2 text-xs font-semibold text-white/60">
+                  <Files className="h-4 w-4 text-indigo-200" />
+                  Files Scanned
+                </div>
+                <div className="mt-2 text-2xl font-bold">{totalStats.totalFiles}</div>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-white/4 p-5 backdrop-blur">
+                <div className="flex items-center gap-2 text-xs font-semibold text-white/60">
+                  <Clock className="h-4 w-4 text-indigo-200" />
+                  Total Scan Time
+                </div>
                 <div className="mt-2 text-2xl font-bold">
-                  {Object.keys(scanResults).length}
+                  {totalStats.totalDuration > 0 ? formatDuration(totalStats.totalDuration) : "—"}
                 </div>
               </div>
 
               <div className="rounded-2xl border border-white/10 bg-white/4 p-5 backdrop-blur">
-                <div className="text-xs font-semibold text-white/60">Status</div>
-                <div className="mt-2">
-                  <StatusPill
-                    result={
-                      Object.values(scanResults).find((r) =>
-                        (r.status || "").toLowerCase().includes("scan")
-                      ) || undefined
-                    }
-                  />
+                <div className="flex items-center gap-2 text-xs font-semibold text-white/60">
+                  <ShieldCheck className="h-4 w-4 text-indigo-200" />
+                  Issues Found
                 </div>
+                <div className="mt-2 text-2xl font-bold">{totalStats.totalIssues}</div>
               </div>
             </motion.div>
           </motion.div>

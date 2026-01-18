@@ -1,4 +1,3 @@
-// /lib/scanner.ts
 import type { ScanIssue } from "./types";
 export type { ScanIssue };
 
@@ -14,13 +13,13 @@ type GithubContentsItem = {
 export type ScanEvent =
   | { type: "status"; file: string; filesSeen: number; totalFiles?: number }
   | { type: "issue"; issue: ScanIssue }
-  | { type: "done"; totalIssues: number; totalFiles: number }
+  | { type: "done"; totalIssues: number; totalFiles: number; durationMs: number }
   | { type: "error"; message: string };
 
 export type ScanCallbacks = {
   onStatus?: (file: string, filesSeen: number) => void;
   onIssue?: (issue: ScanIssue) => void;
-  onDone?: (totalIssues: number, totalFiles: number) => void;
+  onDone?: (totalIssues: number, totalFiles: number, durationMs: number) => void;
   onError?: (message: string) => void;
 };
 
@@ -76,8 +75,9 @@ export async function scanRepo(
   accessToken: string,
   opts?: { maxFiles?: number; maxBytesPerFile?: number },
   callbacks?: ScanCallbacks
-): Promise<ScanIssue[]> {
+): Promise<{ issues: ScanIssue[]; totalFiles: number; durationMs: number }> {
   const issues: ScanIssue[] = [];
+  const startTime = Date.now();
 
   const maxFiles = opts?.maxFiles ?? 200; // prevent timeouts
   const maxBytesPerFile = opts?.maxBytesPerFile ?? 300_000; // ~300KB
@@ -116,7 +116,7 @@ export async function scanRepo(
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       const msg = err?.message || `GitHub API error ${res.status}`;
-      // Return empty list so scanning doesn’t crash
+      // Return empty list so scanning doesn't crash
       console.warn("fetchDir failed:", url, msg);
       return [];
     }
@@ -191,7 +191,8 @@ export async function scanRepo(
   // Start at repo root
   await walk("");
 
-  callbacks?.onDone?.(issues.length, filesSeen);
+  const durationMs = Date.now() - startTime;
+  callbacks?.onDone?.(issues.length, filesSeen, durationMs);
 
-  return issues;
+  return { issues, totalFiles: filesSeen, durationMs };
 }

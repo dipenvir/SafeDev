@@ -37,8 +37,8 @@ export async function POST(req: Request) {
             onIssue: (issue: ScanIssue) => {
               sendEvent({ type: "issue", issue });
             },
-            onDone: (totalIssues: number, totalFiles: number) => {
-              sendEvent({ type: "done", totalIssues, totalFiles });
+            onDone: (totalIssues: number, totalFiles: number, durationMs: number) => {
+              sendEvent({ type: "done", totalIssues, totalFiles, durationMs });
             },
             onError: (message: string) => {
               sendEvent({ type: "error", message });
