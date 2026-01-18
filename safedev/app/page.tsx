@@ -103,7 +103,8 @@ export default function Home() {
   return (
     <div className="font-sans text-gray-900">
       {/* HERO */}
-      <section className="relative isolate overflow-hidden bg-[#070A12] text-white">
+      <section className="relative isolate overflow-hidden bg-[#070A12] text-white min-h-screen flex items-center">
+        {/* Animated background */}
         <motion.div
           aria-hidden
           className="pointer-events-none absolute inset-0"
@@ -111,18 +112,69 @@ export default function Home() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, ease: EASE_OUT }}
         >
+          {/* Primary glow */}
           <motion.div
-            className="absolute -top-40 left-1/2 h-130 w-130 -translate-x-1/2 rounded-full bg-indigo-500/25 blur-3xl"
-            animate={{ y: [0, 18, 0], scale: [1, 1.05, 1] }}
+            className="absolute -top-40 left-1/2 h-150 w-150 -translate-x-1/2 rounded-full bg-indigo-500/25 blur-3xl"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ 
+              y: [0, 30, 0], 
+              scale: [1, 1.1, 1],
+              opacity: [0.25, 0.35, 0.25]
+            }}
             transition={{ duration: 8, repeat: Infinity, ease: EASE_IN_OUT }}
           />
+          
+          {/* Secondary glow */}
           <motion.div
             className="absolute -bottom-56 -left-24 h-130 w-130 rounded-full bg-fuchsia-500/20 blur-3xl"
-            animate={{ x: [0, 16, 0], scale: [1, 1.05, 1] }}
-            transition={{ duration: 10, repeat: Infinity, ease: EASE_IN_OUT }}
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ 
+              x: [0, 20, 0], 
+              scale: [1, 1.08, 1],
+              opacity: [0.2, 0.3, 0.2]
+            }}
+            transition={{ duration: 10, repeat: Infinity, ease: EASE_IN_OUT, delay: 0.5 }}
           />
+          
+          {/* Tertiary glow */}
+          <motion.div
+            className="absolute top-1/3 -right-32 h-100 w-100 rounded-full bg-cyan-500/15 blur-3xl"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ 
+              y: [0, -25, 0],
+              x: [0, -15, 0],
+              scale: [1, 1.05, 1],
+              opacity: [0.15, 0.25, 0.15]
+            }}
+            transition={{ duration: 12, repeat: Infinity, ease: EASE_IN_OUT, delay: 1 }}
+          />
+          
+          {/* Gradient overlays */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.18),transparent_55%),radial-gradient(ellipse_at_bottom,rgba(217,70,239,0.14),transparent_55%)]" />
           <div className="absolute inset-0 opacity-[0.10] bg-[linear-gradient(to_right,rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.12)_1px,transparent_1px)] bg-size-[56px_56px]" />
+          
+          {/* Floating particles */}
+          {[12, 87, 34, 62, 8, 91, 45, 23, 76, 55, 3, 68, 29, 82, 41, 17, 94, 58, 36, 71, 19, 84, 47, 6].map((left, i) => (
+            <motion.div
+              key={i}
+              className="absolute h-3 w-3 rounded-full bg-white/60"
+              style={{
+                left: `${left}%`,
+                top: `${[15, 72, 38, 85, 9, 53, 67, 24, 91, 42, 78, 31, 63, 5, 88, 47, 19, 74, 56, 33, 81, 12, 65, 28][i]}%`,
+              }}
+              animate={{
+                y: [0, -30 - (i % 6) * 3, 0],
+                opacity: [0.4, 0.9, 0.4],
+                scale: [1, 1.3, 1],
+              }}
+              transition={{
+                duration: 4 + (i % 5) * 0.3,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: i * 0.15,
+              }}
+            />
+          ))}
         </motion.div>
 
         <div className="relative mx-auto max-w-6xl px-6 py-28 md:py-36">
@@ -132,16 +184,25 @@ export default function Home() {
             animate="show"
             className="mx-auto max-w-3xl text-center"
           >
+            {/* Badge with pulse animation */}
             <motion.div
               variants={fadeUp}
               className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80 backdrop-blur"
             >
-              <Sparkles className="h-4 w-4 text-indigo-200" />
+              <motion.div
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <Sparkles className="h-4 w-4 text-indigo-200" />
+              </motion.div>
               Developer-first security platform
             </motion.div>
 
+            {/* Main title with dramatic entrance */}
             <motion.h1
-              variants={fadeUp}
+              initial={{ opacity: 0, y: 50, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.8, ease: EASE_OUT, delay: 0.2 }}
               className="text-balance text-5xl font-bold tracking-tight md:text-7xl"
             >
               Secure your code{" "}
@@ -158,27 +219,35 @@ export default function Home() {
               JWTs, and delivers actionable security insights — all in minutes.
             </motion.p>
 
+            {/* CTA buttons with hover effects */}
             <motion.div
               variants={fadeUp}
               className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row"
             >
               <Link
                 href="/github"
-                className="group inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-semibold text-[#070A12] shadow-lg shadow-indigo-500/10 transition hover:bg-white/90"
+                className="group inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-semibold text-[#070A12] shadow-lg shadow-indigo-500/10 transition hover:bg-white/90 hover:shadow-indigo-500/20"
               >
                 <GithubIcon className="h-4 w-4" />
                 Start Scanning Free
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                <motion.span
+                  className="inline-block"
+                  whileHover={{ x: 4 }}
+                  transition={{ type: "spring", stiffness: 400 }}
+                >
+                  <ArrowRight className="h-4 w-4" />
+                </motion.span>
               </Link>
 
               <Link
                 href="/about"
-                className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white/80 backdrop-blur transition hover:bg-white/8"
+                className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white/80 backdrop-blur transition hover:bg-white/8 hover:border-white/25"
               >
                 How It Works
               </Link>
             </motion.div>
 
+            {/* Feature pills with staggered animation */}
             <motion.div
               variants={fadeUp}
               className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-3"
@@ -188,17 +257,44 @@ export default function Home() {
                 { icon: Zap, label: "Real-time scanning" },
                 { icon: Eye, label: "AI-powered analysis" },
               ].map((it, i) => (
-                <div
+                <motion.div
                   key={i}
-                  className="flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/3 px-4 py-3 text-sm text-white/70 backdrop-blur"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 + i * 0.1, duration: 0.5 }}
+                  whileHover={{ scale: 1.02, backgroundColor: "rgba(255,255,255,0.06)" }}
+                  className="flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/3 px-4 py-3 text-sm text-white/70 backdrop-blur transition-colors"
                 >
                   <it.icon className="h-4 w-4 text-indigo-200" />
                   {it.label}
-                </div>
+                </motion.div>
               ))}
             </motion.div>
           </motion.div>
         </div>
+        
+        {/* Scroll indicator */}
+        <motion.div
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.5, duration: 0.5 }}
+        >
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            className="flex flex-col items-center gap-2"
+          >
+            <span className="text-xs text-white/40">Scroll to explore</span>
+            <div className="h-6 w-4 rounded-full border border-white/20 p-1">
+              <motion.div
+                animate={{ y: [0, 8, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                className="h-1.5 w-1.5 rounded-full bg-white/40"
+              />
+            </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* SOCIAL PROOF / STATS */}

@@ -124,7 +124,7 @@ export default function AboutPage() {
   return (
     <div className="font-sans text-gray-900">
       {/* HERO */}
-      <section className="relative isolate overflow-hidden bg-[#070A12] text-white">
+      <section className="relative isolate overflow-hidden bg-[#070A12] text-white min-h-[80vh] flex items-center">
         <motion.div
           aria-hidden
           className="pointer-events-none absolute inset-0"
@@ -132,18 +132,59 @@ export default function AboutPage() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, ease: EASE_OUT }}
         >
+          {/* Animated orbs */}
           <motion.div
-            className="absolute -top-40 left-1/2 h-130 w-130 -translate-x-1/2 rounded-full bg-indigo-500/25 blur-3xl"
-            animate={{ y: [0, 18, 0], scale: [1, 1.05, 1] }}
+            className="absolute -top-40 left-1/2 h-137.5 w-137.5 -translate-x-1/2 rounded-full bg-indigo-500/25 blur-3xl"
+            animate={{ 
+              y: [0, 25, 0], 
+              scale: [1, 1.08, 1],
+              rotate: [0, 5, 0]
+            }}
             transition={{ duration: 8, repeat: Infinity, ease: EASE_IN_OUT }}
           />
           <motion.div
             className="absolute -bottom-56 -right-24 h-130 w-130 rounded-full bg-fuchsia-500/20 blur-3xl"
-            animate={{ x: [0, -16, 0], scale: [1, 1.05, 1] }}
+            animate={{ 
+              x: [0, -20, 0], 
+              scale: [1, 1.06, 1],
+              rotate: [0, -3, 0]
+            }}
             transition={{ duration: 10, repeat: Infinity, ease: EASE_IN_OUT }}
           />
+          <motion.div
+            className="absolute top-1/2 -left-32 h-87.5 w-87.5 rounded-full bg-emerald-500/10 blur-3xl"
+            animate={{ 
+              y: [0, -30, 0],
+              scale: [1, 1.1, 1]
+            }}
+            transition={{ duration: 12, repeat: Infinity, ease: EASE_IN_OUT, delay: 2 }}
+          />
+          
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.18),transparent_55%),radial-gradient(ellipse_at_bottom,rgba(217,70,239,0.14),transparent_55%)]" />
           <div className="absolute inset-0 opacity-[0.10] bg-[linear-gradient(to_right,rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.12)_1px,transparent_1px)] bg-size-[56px_56px]" />
+          
+          {/* Floating elements */}
+          {[7, 93, 28, 61, 14, 82, 39, 56, 3, 71, 45, 88, 22, 67, 11, 79, 34, 95, 48, 63, 18, 86, 41, 52, 9, 74, 31, 89, 57, 4].map((left, i) => (
+            <motion.div
+              key={i}
+              className="absolute h-4 w-4 rounded-full bg-white/50"
+              style={{
+                left: `${left}%`,
+                top: `${[23, 67, 8, 45, 81, 34, 92, 16, 58, 73, 29, 86, 41, 12, 65, 37, 78, 5, 52, 94, 21, 69, 44, 83, 17, 61, 38, 76, 9, 55][i]}%`,
+              }}
+              animate={{
+                y: [0, -25 - (i % 5) * 2, 0],
+                x: [0, (i % 2 === 0 ? 12 : -12), 0],
+                opacity: [0.3, 0.8, 0.3],
+              }}
+              transition={{
+                duration: 4 + (i % 6) * 0.25,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: i * 0.12,
+              }}
+            />
+          ))}
         </motion.div>
 
         <div className="relative mx-auto max-w-6xl px-6 py-24 md:py-32">
@@ -157,18 +198,33 @@ export default function AboutPage() {
               variants={fadeUp}
               className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80 backdrop-blur"
             >
-              <Heart className="h-4 w-4 text-indigo-200" />
+              <motion.div
+                animate={{ 
+                  scale: [1, 1.15, 1],
+                  rotate: [0, 10, -10, 0]
+                }}
+                transition={{ duration: 3, repeat: Infinity }}
+              >
+                <Heart className="h-4 w-4 text-indigo-200" />
+              </motion.div>
               About SafeDev
             </motion.div>
 
             <motion.h1
-              variants={fadeUp}
+              initial={{ opacity: 0, y: 40, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.8, ease: EASE_OUT, delay: 0.15 }}
               className="text-balance text-4xl font-bold tracking-tight md:text-6xl"
             >
               Security should{" "}
-              <span className="bg-linear-to-r from-indigo-200 via-white to-fuchsia-200 bg-clip-text text-transparent">
+              <motion.span 
+                className="bg-linear-to-r from-indigo-200 via-white to-fuchsia-200 bg-clip-text text-transparent inline-block"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4, duration: 0.6 }}
+              >
                 help you ship faster
-              </span>
+              </motion.span>
               , not get in your way
             </motion.h1>
 
@@ -179,6 +235,24 @@ export default function AboutPage() {
               We built SafeDev because security tools should be fast, clear, and
               actually useful for the people writing code.
             </motion.p>
+            
+            {/* Animated CTA buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+              className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row"
+            >
+              <Link
+                href="/github"
+                className="group inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-semibold text-[#070A12] shadow-lg shadow-indigo-500/10 transition hover:bg-white/90"
+              >
+                Get Started
+                <motion.span whileHover={{ x: 4 }} transition={{ type: "spring", stiffness: 400 }}>
+                  <ArrowRight className="h-4 w-4" />
+                </motion.span>
+              </Link>
+            </motion.div>
           </motion.div>
         </div>
       </section>

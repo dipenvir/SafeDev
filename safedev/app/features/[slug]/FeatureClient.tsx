@@ -94,7 +94,7 @@ export default function FeatureClient({
     return (
         <div className="font-sans text-gray-900">
             {/* HERO */}
-            <section className="relative isolate overflow-hidden bg-[#070A12] text-white">
+            <section className="relative isolate overflow-hidden bg-[#070A12] text-white min-h-[70vh] flex items-center">
                 <motion.div
                     aria-hidden
                     className="pointer-events-none absolute inset-0"
@@ -102,18 +102,58 @@ export default function FeatureClient({
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.8, ease: EASE_OUT }}
                 >
+                    {/* Dynamic glows based on feature */}
                     <motion.div
                         className="absolute -top-40 left-1/2 h-130 w-130 -translate-x-1/2 rounded-full bg-indigo-500/25 blur-3xl"
-                        animate={{ y: [0, 18, 0], scale: [1, 1.05, 1] }}
+                        animate={{ 
+                            y: [0, 20, 0], 
+                            scale: [1, 1.08, 1],
+                            opacity: [0.25, 0.35, 0.25]
+                        }}
                         transition={{ duration: 8, repeat: Infinity, ease: EASE_IN_OUT }}
                     />
                     <motion.div
-                        className="absolute -bottom-56 -left-24 h-130 w-130 rounded-full bg-fuchsia-500/20 blur-3xl"
-                        animate={{ x: [0, 16, 0], scale: [1, 1.05, 1] }}
+                        className="absolute -bottom-56 -left-24 h-120 w-120 rounded-full bg-fuchsia-500/20 blur-3xl"
+                        animate={{ 
+                            x: [0, 16, 0], 
+                            scale: [1, 1.05, 1],
+                            opacity: [0.2, 0.28, 0.2]
+                        }}
                         transition={{ duration: 10, repeat: Infinity, ease: EASE_IN_OUT }}
                     />
+                    <motion.div
+                        className="absolute top-1/4 -right-20 h-75 w-75 rounded-full bg-cyan-500/15 blur-3xl"
+                        animate={{ 
+                            y: [0, -20, 0],
+                            scale: [1, 1.1, 1]
+                        }}
+                        transition={{ duration: 9, repeat: Infinity, ease: EASE_IN_OUT, delay: 1 }}
+                    />
+                    
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.18),transparent_55%),radial-gradient(ellipse_at_bottom,rgba(217,70,239,0.14),transparent_55%)]" />
                     <div className="absolute inset-0 opacity-[0.10] bg-[linear-gradient(to_right,rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.12)_1px,transparent_1px)] bg-size-[56px_56px]" />
+                    
+                    {/* Animated dots */}
+                    {[15, 78, 42, 91, 6, 63, 27, 84, 51, 33, 69, 12, 88, 45, 22, 76, 38, 94, 57, 8].map((left, i) => (
+                        <motion.div
+                            key={i}
+                            className="absolute h-3 w-3 rounded-full bg-white/55"
+                            style={{
+                                left: `${left}%`,
+                                top: `${[31, 72, 14, 58, 89, 23, 67, 41, 85, 9, 52, 78, 36, 93, 18, 64, 47, 81, 27, 73][i]}%`,
+                            }}
+                            animate={{
+                                y: [0, -20 - (i % 5) * 3, 0],
+                                opacity: [0.35, 0.85, 0.35],
+                            }}
+                            transition={{
+                                duration: 4 + (i % 5) * 0.3,
+                                repeat: Infinity,
+                                ease: "easeInOut",
+                                delay: i * 0.15,
+                            }}
+                        />
+                    ))}
                 </motion.div>
 
                 <div className="relative mx-auto max-w-6xl px-6 py-20 md:py-24">
@@ -121,9 +161,11 @@ export default function FeatureClient({
                         <motion.div variants={fadeUp}>
                             <Link
                                 href="/about#features"
-                                className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white transition"
+                                className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white transition group"
                             >
-                                <ArrowLeft className="h-4 w-4" />
+                                <motion.span whileHover={{ x: -4 }} transition={{ type: "spring", stiffness: 400 }}>
+                                    <ArrowLeft className="h-4 w-4" />
+                                </motion.span>
                                 Back to Features
                             </Link>
                         </motion.div>
@@ -132,17 +174,47 @@ export default function FeatureClient({
                             variants={fadeUp}
                             className="mt-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80 backdrop-blur"
                         >
-                            <Sparkles className="h-4 w-4 text-indigo-200" />
+                            <motion.div
+                                animate={{ rotate: [0, 360] }}
+                                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                            >
+                                <Sparkles className="h-4 w-4 text-indigo-200" />
+                            </motion.div>
                             SafeDev Feature
                         </motion.div>
 
                         <motion.div variants={fadeUp} className="mt-6 flex items-center gap-4">
-                            <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/5 backdrop-blur">
-                                <Icon className="h-7 w-7 text-indigo-200" />
-                            </div>
+                            <motion.div 
+                                className="inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/5 backdrop-blur"
+                                whileHover={{ scale: 1.05, borderColor: "rgba(255,255,255,0.2)" }}
+                                transition={{ type: "spring", stiffness: 300 }}
+                            >
+                                <motion.div
+                                    animate={{ 
+                                        scale: [1, 1.1, 1],
+                                    }}
+                                    transition={{ duration: 2, repeat: Infinity }}
+                                >
+                                    <Icon className="h-7 w-7 text-indigo-200" />
+                                </motion.div>
+                            </motion.div>
                             <div>
-                                <h1 className="text-4xl font-bold tracking-tight md:text-5xl">{feature.name}</h1>
-                                <p className="mt-1 text-white/70">{feature.tagline}</p>
+                                <motion.h1 
+                                    className="text-4xl font-bold tracking-tight md:text-5xl"
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.3, duration: 0.6 }}
+                                >
+                                    {feature.name}
+                                </motion.h1>
+                                <motion.p 
+                                    className="mt-1 text-white/70"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: 0.4, duration: 0.5 }}
+                                >
+                                    {feature.tagline}
+                                </motion.p>
                             </div>
                         </motion.div>
 
@@ -151,26 +223,39 @@ export default function FeatureClient({
                         </motion.p>
 
                         <motion.div variants={fadeUp} className="mt-8 flex flex-wrap gap-3">
-                            {feature.bullets.slice(0, 3).map((b) => (
-                                <Pill key={b} text={b} />
+                            {feature.bullets.slice(0, 3).map((b, i) => (
+                                <motion.div
+                                    key={b}
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ delay: 0.5 + i * 0.1 }}
+                                >
+                                    <Pill text={b} />
+                                </motion.div>
                             ))}
                         </motion.div>
 
                         <motion.div variants={fadeUp} className="mt-10 flex flex-col gap-3 sm:flex-row">
-                            <a
+                            <motion.a
                                 href="/github"
                                 className="group inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-[#070A12] shadow-lg shadow-indigo-500/10 transition hover:bg-white/90"
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
                             >
                                 Try Now
-                                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                            </a>
+                                <motion.span whileHover={{ x: 4 }} transition={{ type: "spring", stiffness: 400 }}>
+                                    <ArrowRight className="h-4 w-4" />
+                                </motion.span>
+                            </motion.a>
 
-                            <a
+                            <motion.a
                                 href="#details"
                                 className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white/80 backdrop-blur transition hover:bg-white/8"
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
                             >
                                 See Details
-                            </a>
+                            </motion.a>
                         </motion.div>
                     </motion.div>
                 </div>
