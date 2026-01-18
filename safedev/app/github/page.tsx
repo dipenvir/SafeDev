@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession, signIn, signOut } from "next-auth/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Variants } from "framer-motion";
@@ -15,10 +15,11 @@ import {
   FolderGit2,
   CheckCircle2,
   AlertTriangle,
+  FileCode,
 } from "lucide-react";
 import GitHubRepoCard from "../../components/GitHubRepoCard";
 import GithubIcon from "../../components/GithubIcon";
-import type { ScanResult } from "../../lib/types";
+import type { ScanResult, ScanIssue } from "../../lib/types";
 
 interface Repo {
   id: number;
@@ -60,15 +61,25 @@ function StatusPill({ result }: { result?: ScanResult }) {
   const ok =
     status.includes("done") ||
     status.includes("complete") ||
-    status.includes("success");
+    status.includes("success") ||
+    status.includes("clean") ||
+    status.includes("issues found");
   const error = status.includes("error") || status.includes("fail");
 
   if (scanning) {
     return (
-      <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
-        <Loader2 className="h-3.5 w-3.5 animate-spin text-indigo-200" />
-        Scanning…
-      </span>
+      <div className="flex flex-col items-end gap-1">
+        <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
+          <Loader2 className="h-3.5 w-3.5 animate-spin text-indigo-200" />
+          Scanning… {result.filesScanned ? `(${result.filesScanned} files)` : ""}
+        </span>
+        {result.currentFile && (
+          <span className="inline-flex items-center gap-1.5 text-[10px] text-white/50 max-w-50 truncate">
+            <FileCode className="h-3 w-3 shrink-0" />
+            <span className="truncate">{result.currentFile}</span>
+          </span>
+        )}
+      </div>
     );
   }
 
@@ -85,7 +96,7 @@ function StatusPill({ result }: { result?: ScanResult }) {
     return (
       <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-100">
         <CheckCircle2 className="h-3.5 w-3.5" />
-        Clean
+        Clean {result.filesScanned ? `(${result.filesScanned} files)` : ""}
       </span>
     );
   }
@@ -132,12 +143,12 @@ export default function GitHubPage() {
     return repos.filter((r) => r.name.toLowerCase().includes(q));
   }, [repos, query]);
 
-  const handleScan = async (repoName: string) => {
+  const handleScan = useCallback(async (repoName: string) => {
     if (!session?.accessToken) return;
 
     setScanResults((prev) => ({
       ...prev,
-      [repoName]: { status: "Scanning...", issuesFound: 0, details: [] },
+      [repoName]: { status: "Scanning...", issuesFound: 0, details: [], currentFile: "", filesScanned: 0 },
     }));
 
     try {
@@ -147,8 +158,77 @@ export default function GitHubPage() {
         body: JSON.stringify({ repoName, accessToken: session.accessToken }),
       });
 
-      const data = await res.json();
-      setScanResults((prev) => ({ ...prev, [repoName]: data }));
+      if (!res.ok || !res.body) {
+        throw new Error("Failed to start scan");
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      const collectedIssues: ScanIssue[] = [];
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const jsonStr = line.slice(6);
+          try {
+            const event = JSON.parse(jsonStr);
+
+            if (event.type === "status") {
+              setScanResults((prev) => ({
+                ...prev,
+                [repoName]: {
+                  ...prev[repoName],
+                  status: "Scanning...",
+                  currentFile: event.file,
+                  filesScanned: event.filesSeen,
+                },
+              }));
+            } else if (event.type === "issue") {
+              collectedIssues.push(event.issue);
+              setScanResults((prev) => ({
+                ...prev,
+                [repoName]: {
+                  ...prev[repoName],
+                  status: "Scanning...",
+                  issuesFound: collectedIssues.length,
+                  details: [...collectedIssues],
+                },
+              }));
+            } else if (event.type === "done") {
+              setScanResults((prev) => ({
+                ...prev,
+                [repoName]: {
+                  ...prev[repoName],
+                  status: collectedIssues.length > 0 ? "Issues Found" : "Clean",
+                  issuesFound: event.totalIssues,
+                  details: [...collectedIssues],
+                  filesScanned: event.totalFiles,
+                  currentFile: undefined,
+                },
+              }));
+            } else if (event.type === "error") {
+              setScanResults((prev) => ({
+                ...prev,
+                [repoName]: {
+                  ...prev[repoName],
+                  status: "Error",
+                  error: event.message,
+                },
+              }));
+            }
+          } catch {
+            // Skip malformed JSON
+          }
+        }
+      }
     } catch (err) {
       console.error(err);
       setScanResults((prev) => ({
@@ -156,7 +236,7 @@ export default function GitHubPage() {
         [repoName]: { status: "Error", issuesFound: 0, details: [] },
       }));
     }
-  };
+  }, [session?.accessToken]);
 
   const isAuthed = !!session;
 

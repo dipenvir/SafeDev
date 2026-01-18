@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
 import { scanRepo } from "../../../../lib/scanner";
-import type { ScanResult } from "../../../../lib/types";
+import type { ScanEvent } from "../../../../lib/scanner";
+import type { ScanIssue } from "../../../../lib/types";
 
 export async function POST(req: Request) {
   try {
@@ -11,26 +11,60 @@ export async function POST(req: Request) {
       headers: { Authorization: `token ${accessToken}` },
     });
     const user = await userRes.json();
-    
+
     if (!user.login) {
-      const errorResponse: ScanResult = { status: "Error", issuesFound: 0, details: [], error: "Failed to get user info" };
-      return NextResponse.json(errorResponse, { status: 400 });
+      return new Response(
+        JSON.stringify({ type: "error", message: "Failed to get user info" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
     }
 
     const repoUrl = `https://github.com/${user.login}/${repoName}`;
-    const results = await scanRepo(repoUrl, accessToken);
 
-    const response: ScanResult = {
-      repoName,
-      status: results.length > 0 ? "Issues Found" : "Clean",
-      issuesFound: results.length,
-      details: results,
-    };
+    // Create a readable stream for SSE
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      async start(controller) {
+        const sendEvent = (event: ScanEvent) => {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
+        };
 
-    return NextResponse.json(response);
+        try {
+          await scanRepo(repoUrl, accessToken, undefined, {
+            onStatus: (file: string, filesSeen: number) => {
+              sendEvent({ type: "status", file, filesSeen });
+            },
+            onIssue: (issue: ScanIssue) => {
+              sendEvent({ type: "issue", issue });
+            },
+            onDone: (totalIssues: number, totalFiles: number) => {
+              sendEvent({ type: "done", totalIssues, totalFiles });
+            },
+            onError: (message: string) => {
+              sendEvent({ type: "error", message });
+            },
+          });
+        } catch (err) {
+          const message = err instanceof Error ? err.message : "Unknown error";
+          sendEvent({ type: "error", message });
+        } finally {
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+      },
+    });
   } catch (err) {
     console.error(err);
-    const errorResponse: ScanResult = { status: "Error", issuesFound: 0, details: [] };
-    return NextResponse.json(errorResponse);
+    return new Response(
+      JSON.stringify({ type: "error", message: "Failed to start scan" }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   }
 }

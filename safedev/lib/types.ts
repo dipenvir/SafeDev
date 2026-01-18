@@ -11,4 +11,6 @@ export interface ScanResult {
   issuesFound: number;
   details: ScanIssue[];
   error?: string;
+  currentFile?: string;
+  filesScanned?: number;
 }

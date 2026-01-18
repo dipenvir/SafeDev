@@ -11,6 +11,19 @@ type GithubContentsItem = {
   size?: number;
 };
 
+export type ScanEvent =
+  | { type: "status"; file: string; filesSeen: number; totalFiles?: number }
+  | { type: "issue"; issue: ScanIssue }
+  | { type: "done"; totalIssues: number; totalFiles: number }
+  | { type: "error"; message: string };
+
+export type ScanCallbacks = {
+  onStatus?: (file: string, filesSeen: number) => void;
+  onIssue?: (issue: ScanIssue) => void;
+  onDone?: (totalIssues: number, totalFiles: number) => void;
+  onError?: (message: string) => void;
+};
+
 function isProbablyBinary(path: string) {
   return /\.(png|jpe?g|gif|webp|ico|pdf|zip|gz|tar|tgz|7z|rar|mp4|mov|mp3|wav|woff2?|ttf|eot|exe|dmg)$/i.test(
     path
@@ -61,7 +74,8 @@ function detectIssues(content: string, fileName: string) {
 export async function scanRepo(
   repoRef: string,
   accessToken: string,
-  opts?: { maxFiles?: number; maxBytesPerFile?: number }
+  opts?: { maxFiles?: number; maxBytesPerFile?: number },
+  callbacks?: ScanCallbacks
 ): Promise<ScanIssue[]> {
   const issues: ScanIssue[] = [];
 
@@ -72,7 +86,9 @@ export async function scanRepo(
   const [owner, repo] = cleaned.split("/");
 
   if (!owner || !repo) {
-    throw new Error(`Invalid repoRef. Expected "owner/repo" or GitHub URL. Got: ${repoRef}`);
+    const errMsg = `Invalid repoRef. Expected "owner/repo" or GitHub URL. Got: ${repoRef}`;
+    callbacks?.onError?.(errMsg);
+    throw new Error(errMsg);
   }
 
   const headers: Record<string, string> = {
@@ -82,6 +98,16 @@ export async function scanRepo(
   };
 
   let filesSeen = 0;
+  let lastStatusTime = Date.now();
+  const STATUS_INTERVAL_MS = 500; // Send status every 500ms at most
+
+  function maybeEmitStatus(filePath: string) {
+    const now = Date.now();
+    if (now - lastStatusTime >= STATUS_INTERVAL_MS) {
+      callbacks?.onStatus?.(filePath, filesSeen);
+      lastStatusTime = now;
+    }
+  }
 
   async function fetchDir(path: string): Promise<GithubContentsItem[]> {
     const url = `https://api.github.com/repos/${owner}/${repo}/contents${path ? `/${encodeURIComponent(path).replace(/%2F/g, "/")}` : ""}`;
@@ -139,11 +165,14 @@ export async function scanRepo(
       if (item.type !== "file") continue;
 
       filesSeen++;
+      maybeEmitStatus(item.path);
 
       // filename-only checks without reading file
       const nameOnly = item.name;
       if (nameOnly === ".env") {
-        issues.push({ file: item.path, issues: [".env file present, may contain secrets"] });
+        const issue: ScanIssue = { file: item.path, issues: [".env file present, may contain secrets"] };
+        issues.push(issue);
+        callbacks?.onIssue?.(issue);
         continue;
       }
 
@@ -151,12 +180,18 @@ export async function scanRepo(
       if (!content) continue;
 
       const fileIssues = detectIssues(content, nameOnly);
-      if (fileIssues.length > 0) issues.push({ file: item.path, issues: fileIssues });
+      if (fileIssues.length > 0) {
+        const issue: ScanIssue = { file: item.path, issues: fileIssues };
+        issues.push(issue);
+        callbacks?.onIssue?.(issue);
+      }
     }
   }
 
   // Start at repo root
   await walk("");
+
+  callbacks?.onDone?.(issues.length, filesSeen);
 
   return issues;
 }
