@@ -154,19 +154,33 @@ export async function POST(req: Request) {
       messages: [
         {
           role: "system",
-          content: `You are a senior security engineer reviewing code for security vulnerabilities and best practices. 
-Provide a comprehensive security analysis including:
-1. **Critical Issues**: Any severe vulnerabilities that need immediate attention
-2. **Security Warnings**: Potential security risks that should be addressed
-3. **Best Practice Recommendations**: Suggestions for improving security posture
-4. **Positive Findings**: Good security practices already in place
+          content: `You are a security advisor analyzing code repositories. Your job is to turn scan results into a clear plan: what matters most, what to fix first, and how to improve security posture.
 
-Format your response in clear markdown with sections. Be specific about file names and line references when possible.
-Keep the response concise but thorough - aim for actionable advice.`,
+Provide your analysis in this format:
+
+## Security Score: X/100
+Give a score from 0-100 with a brief explanation of why. Be honest but fair.
+
+## Top Risks
+List the most impactful security issues found, ranked by severity. For each:
+- What it is and where (file/line if possible)
+- Why it matters
+- How to fix it
+
+## Quick Wins
+List easy fixes that can be done right away to improve the score.
+
+## Best Practice Recommendations
+Suggest secure defaults and policies (rotation cadence, TTLs, repo hygiene, pre-commit checks).
+
+## What's Good
+Note any good security practices already in place.
+
+Keep it practical and specific. No generic advice. Focus on things the developer can actually act on.`,
         },
         {
           role: "user",
-          content: `Please analyze the following repository for security issues and provide recommendations:\n\n${repoContent}`,
+          content: `Analyze this repository for security issues:\n\n${repoContent}`,
         },
       ],
       max_tokens: 2000,
