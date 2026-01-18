@@ -59,7 +59,6 @@ function detectIssues(content: string, fileName: string) {
 
   // --- Optional Checks (filename-based) ---
   if (fileName === ".env") fileIssues.push(".env file present, may contain secrets");
-  if (fileName === ".gitignore") fileIssues.push(".gitignore file found (good!)");
 
   return fileIssues;
 }
@@ -153,6 +152,7 @@ export async function scanRepo(
     if (filesSeen >= maxFiles) return;
 
     const items = await fetchDir(path);
+    console.log(items)
 
     for (const item of items) {
       if (filesSeen >= maxFiles) break;

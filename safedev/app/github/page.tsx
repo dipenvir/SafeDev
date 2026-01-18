@@ -27,6 +27,11 @@ import type { ScanResult, ScanIssue } from "../../lib/types";
 interface Repo {
   id: number;
   name: string;
+  full_name: string;
+  owner: {
+    login: string;
+    avatar_url: string;
+  };
   description: string | null;
   html_url: string;
 }
@@ -200,19 +205,19 @@ export default function GitHubPage() {
     return { totalFiles, totalDuration, totalIssues, completedScans: completedScans.length };
   }, [scanResults]);
 
-  const handleScan = useCallback(async (repoName: string) => {
+  const handleScan = useCallback(async (repoFullName: string) => {
     if (!session?.accessToken) return;
 
     setScanResults((prev) => ({
       ...prev,
-      [repoName]: { status: "Scanning...", issuesFound: 0, details: [], currentFile: "", filesScanned: 0 },
+      [repoFullName]: { status: "Scanning...", issuesFound: 0, details: [], currentFile: "", filesScanned: 0 },
     }));
 
     try {
       const res = await fetch("/api/github/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ repoName, accessToken: session.accessToken }),
+        body: JSON.stringify({ repoName: repoFullName, accessToken: session.accessToken }),
       });
 
       if (!res.ok || !res.body) {
@@ -241,8 +246,8 @@ export default function GitHubPage() {
             if (event.type === "status") {
               setScanResults((prev) => ({
                 ...prev,
-                [repoName]: {
-                  ...prev[repoName],
+                [repoFullName]: {
+                  ...prev[repoFullName],
                   status: "Scanning...",
                   currentFile: event.file,
                   filesScanned: event.filesSeen,
@@ -252,8 +257,8 @@ export default function GitHubPage() {
               collectedIssues.push(event.issue);
               setScanResults((prev) => ({
                 ...prev,
-                [repoName]: {
-                  ...prev[repoName],
+                [repoFullName]: {
+                  ...prev[repoFullName],
                   status: "Scanning...",
                   issuesFound: collectedIssues.length,
                   details: [...collectedIssues],
@@ -262,8 +267,8 @@ export default function GitHubPage() {
             } else if (event.type === "done") {
               setScanResults((prev) => ({
                 ...prev,
-                [repoName]: {
-                  ...prev[repoName],
+                [repoFullName]: {
+                  ...prev[repoFullName],
                   status: collectedIssues.length > 0 ? "Issues Found" : "Clean",
                   issuesFound: event.totalIssues,
                   details: [...collectedIssues],
@@ -275,8 +280,8 @@ export default function GitHubPage() {
             } else if (event.type === "error") {
               setScanResults((prev) => ({
                 ...prev,
-                [repoName]: {
-                  ...prev[repoName],
+                [repoFullName]: {
+                  ...prev[repoFullName],
                   status: "Error",
                   error: event.message,
                 },
@@ -291,15 +296,15 @@ export default function GitHubPage() {
       console.error(err);
       setScanResults((prev) => ({
         ...prev,
-        [repoName]: { status: "Error", issuesFound: 0, details: [] },
+        [repoFullName]: { status: "Error", issuesFound: 0, details: [] },
       }));
     }
   }, [session?.accessToken]);
 
-  const handleAIAnalysis = useCallback(async (repoName: string) => {
+  const handleAIAnalysis = useCallback(async (repoFullName: string) => {
     if (!session?.accessToken) return;
 
-    setAiRepoName(repoName);
+    setAiRepoName(repoFullName);
     setAiModalOpen(true);
     setAiLoading(true);
     setAiError(null);
@@ -309,7 +314,7 @@ export default function GitHubPage() {
       const res = await fetch("/api/ai-summary", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ repoName, accessToken: session.accessToken }),
+        body: JSON.stringify({ repoName: repoFullName, accessToken: session.accessToken }),
       });
 
       const data = await res.json();
@@ -573,7 +578,7 @@ export default function GitHubPage() {
 
                                 <div className="min-w-0">
                                   <div className="truncate text-lg font-semibold text-white">
-                                    {repo.name}
+                                    <span className="text-white/60 font-normal">{repo.owner.login}/</span>{repo.name}
                                   </div>
                                   <div className="truncate text-sm text-white/60">
                                     {repo.description || "No description"}
@@ -583,7 +588,7 @@ export default function GitHubPage() {
                             </div>
 
                             <div className="flex items-center gap-2">
-                              <StatusPill result={scanResults[repo.name]} />
+                              <StatusPill result={scanResults[repo.full_name]} />
                               <a
                                 href={repo.html_url}
                                 target="_blank"
@@ -603,11 +608,12 @@ export default function GitHubPage() {
                           {/* Dark glass GitHubRepoCard */}
                           <GitHubRepoCard
                             name={repo.name}
+                            owner={repo.owner.login}
                             description={repo.description}
                             html_url={repo.html_url}
-                            onScan={() => handleScan(repo.name)}
-                            onAIAnalysis={() => handleAIAnalysis(repo.name)}
-                            scanResult={scanResults[repo.name]}
+                            onScan={() => handleScan(repo.full_name)}
+                            onAIAnalysis={() => handleAIAnalysis(repo.full_name)}
+                            scanResult={scanResults[repo.full_name]}
                           />
                         </motion.div>
                       ))}

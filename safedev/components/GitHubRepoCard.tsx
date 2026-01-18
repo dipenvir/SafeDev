@@ -16,6 +16,7 @@ import type { ScanResult } from "../lib/types";
 
 interface GitHubRepoCardProps {
   name: string;
+  owner?: string;
   description: string | null;
   html_url: string;
   onScan: () => void;
@@ -92,6 +93,7 @@ function statusMeta(scanResult?: ScanResult) {
 
 export default function GitHubRepoCard({
   name,
+  owner,
   description,
   html_url,
   onScan,

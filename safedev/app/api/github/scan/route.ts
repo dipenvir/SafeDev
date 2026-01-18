@@ -6,20 +6,15 @@ export async function POST(req: Request) {
   try {
     const { repoName, accessToken } = await req.json();
 
-    // Get the authenticated user's username
-    const userRes = await fetch("https://api.github.com/user", {
-      headers: { Authorization: `token ${accessToken}` },
-    });
-    const user = await userRes.json();
-
-    if (!user.login) {
+    // Expect repoName to be in "owner/repo" format
+    if (!repoName || !repoName.includes("/")) {
       return new Response(
-        JSON.stringify({ type: "error", message: "Failed to get user info" }),
+        JSON.stringify({ type: "error", message: "Invalid repo format. Expected owner/repo" }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    const repoUrl = `https://github.com/${user.login}/${repoName}`;
+    const repoUrl = `https://github.com/${repoName}`;
 
     // Create a readable stream for SSE
     const encoder = new TextEncoder();

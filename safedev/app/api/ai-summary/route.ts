@@ -128,21 +128,33 @@ export async function POST(req: Request) {
       );
     }
 
-    // Get the authenticated user's username
-    const userRes = await fetch("https://api.github.com/user", {
-      headers: { Authorization: `token ${accessToken}` },
-    });
-    const user = await userRes.json();
+    // Determine owner and repo name
+    // If repoName contains a slash, it's already in "owner/repo" format
+    // Otherwise, get the authenticated user's username and use that as owner
+    let owner: string;
+    let repo: string;
 
-    if (!user.login) {
-      return new Response(
-        JSON.stringify({ error: "Failed to get user info" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
+    if (repoName.includes("/")) {
+      [owner, repo] = repoName.split("/");
+    } else {
+      // Get the authenticated user's username
+      const userRes = await fetch("https://api.github.com/user", {
+        headers: { Authorization: `token ${accessToken}` },
+      });
+      const user = await userRes.json();
+
+      if (!user.login) {
+        return new Response(
+          JSON.stringify({ error: "Failed to get user info" }),
+          { status: 400, headers: { "Content-Type": "application/json" } }
+        );
+      }
+      owner = user.login;
+      repo = repoName;
     }
 
     // Collect repo contents
-    const repoContent = await collectRepoContents(user.login, repoName, accessToken);
+    const repoContent = await collectRepoContents(owner, repo, accessToken);
 
     // Send to OpenAI for analysis
     const openai = new OpenAI({
