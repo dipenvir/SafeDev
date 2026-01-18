@@ -15,6 +15,9 @@ export default function GitHubPage() {
   const { data: session } = useSession();
   const [repos, setRepos] = useState<Repo[]>([]);
   const [loading, setLoading] = useState(false);
+   const [scanResults, setScanResults] = useState<{
+    [repoName: string]: { status: string; issuesFound: number; details: any[] }
+  }>({});
 
   useEffect(() => {
     if (!session?.accessToken) return;
@@ -28,10 +31,33 @@ export default function GitHubPage() {
       .finally(() => setLoading(false));
   }, [session]);
 
-  const handleScan = (repoName: string) => {
-    // Replace with real backend scan call
-    alert(`Scanning repo: ${repoName}`);
-  };
+const handleScan = async (repoName: string) => {
+  if (!session?.accessToken) return;
+
+  setScanResults((prev) => ({
+    ...prev,
+    [repoName]: { status: "Scanning...", issuesFound: 0, details: [] },
+  }));
+
+  try {
+    const res = await fetch("/api/github/scan", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ repoName, accessToken: session.accessToken }),
+    });
+
+    const data = await res.json();
+    setScanResults((prev) => ({ ...prev, [repoName]: data }));
+  } catch (err) {
+    console.error(err);
+    setScanResults((prev) => ({
+      ...prev,
+      [repoName]: { status: "Error", issuesFound: 0, details: [] },
+    }));
+  }
+};
+
+
 
   return (
     <div className="font-sans text-gray-900 min-h-screen flex flex-col">
@@ -72,6 +98,7 @@ export default function GitHubPage() {
                     description={repo.description}
                     html_url={repo.html_url}
                     onScan={() => handleScan(repo.name)}
+                    scanResult={scanResults[repo.name]}
                   />
                 ))}
               </div>
