@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import GitHubRepoCard from "../../components/GitHubRepoCard";
 import GithubIcon from "../../components/GithubIcon";
+import AISecurityModal from "../../components/AISecurityModal";
 import type { ScanResult, ScanIssue } from "../../lib/types";
 
 interface Repo {
@@ -117,6 +118,13 @@ export default function GitHubPage() {
   const [scanResults, setScanResults] = useState<Record<string, ScanResult>>(
     {}
   );
+
+  // AI Security Modal state
+  const [aiModalOpen, setAiModalOpen] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [aiRepoName, setAiRepoName] = useState("");
 
   useEffect(() => {
     if (!session?.accessToken) return;
@@ -235,6 +243,37 @@ export default function GitHubPage() {
         ...prev,
         [repoName]: { status: "Error", issuesFound: 0, details: [] },
       }));
+    }
+  }, [session?.accessToken]);
+
+  const handleAIAnalysis = useCallback(async (repoName: string) => {
+    if (!session?.accessToken) return;
+
+    setAiRepoName(repoName);
+    setAiModalOpen(true);
+    setAiLoading(true);
+    setAiError(null);
+    setAiAnalysis(null);
+
+    try {
+      const res = await fetch("/api/ai-summary", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ repoName, accessToken: session.accessToken }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        setAiError(data.error || "Failed to analyze repository");
+      } else {
+        setAiAnalysis(data.analysis);
+      }
+    } catch (err) {
+      console.error(err);
+      setAiError("Failed to connect to AI service");
+    } finally {
+      setAiLoading(false);
     }
   }, [session?.accessToken]);
 
@@ -511,6 +550,7 @@ export default function GitHubPage() {
                             description={repo.description}
                             html_url={repo.html_url}
                             onScan={() => handleScan(repo.name)}
+                            onAIAnalysis={() => handleAIAnalysis(repo.name)}
                             scanResult={scanResults[repo.name]}
                           />
                         </motion.div>
@@ -523,6 +563,16 @@ export default function GitHubPage() {
           </AnimatePresence>
         </div>
       </main>
+
+      {/* AI Security Modal */}
+      <AISecurityModal
+        isOpen={aiModalOpen}
+        onClose={() => setAiModalOpen(false)}
+        analysis={aiAnalysis}
+        isLoading={aiLoading}
+        error={aiError}
+        repoName={aiRepoName}
+      />
     </div>
   );
 }

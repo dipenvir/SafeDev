@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   AlertTriangle,
   ChevronDown,
+  BrainCircuit,
 } from "lucide-react";
 import GithubIcon from "./GithubIcon";
 import type { ScanResult } from "../lib/types";
@@ -18,6 +19,7 @@ interface GitHubRepoCardProps {
   description: string | null;
   html_url: string;
   onScan: () => void;
+  onAIAnalysis?: () => void;
   scanResult?: ScanResult;
 }
 
@@ -93,6 +95,7 @@ export default function GitHubRepoCard({
   description,
   html_url,
   onScan,
+  onAIAnalysis,
   scanResult,
 }: GitHubRepoCardProps) {
   const meta = statusMeta(scanResult);
@@ -188,6 +191,25 @@ export default function GitHubRepoCard({
                 <ScanSearch className="h-4 w-4" />
                 {isScanning ? "Scanning..." : "Scan"}
               </button>
+
+              {onAIAnalysis && (
+                <button
+                  onClick={onAIAnalysis}
+                  disabled={isScanning}
+                  className="
+                    inline-flex h-10 items-center justify-center gap-2 rounded-xl
+                    border border-fuchsia-400/30 bg-fuchsia-500/15 px-4 text-sm font-semibold text-fuchsia-200
+                    transition
+                    hover:bg-fuchsia-500/25 hover:border-fuchsia-400/50
+                    disabled:cursor-not-allowed disabled:opacity-60
+                    focus:outline-none focus:ring-4 focus:ring-fuchsia-500/25
+                  "
+                  title="Get AI security advice for this repository"
+                >
+                  <BrainCircuit className="h-4 w-4" />
+                  AI Analysis
+                </button>
+              )}
 
               {hasDetails ? (
                 <span className="inline-flex items-center gap-1 rounded-xl border border-white/10 bg-white/3 px-3 py-2 text-xs font-semibold text-white/70">
