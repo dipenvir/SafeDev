@@ -167,18 +167,17 @@ export default function AboutPage() {
             >
               Security should{" "}
               <span className="bg-linear-to-r from-indigo-200 via-white to-fuchsia-200 bg-clip-text text-transparent">
-                empower developers
+                help you ship faster
               </span>
-              , not slow them down
+              , not get in your way
             </motion.h1>
 
             <motion.p
               variants={fadeUp}
               className="mx-auto mt-6 max-w-2xl text-pretty text-lg text-white/70"
             >
-              We built SafeDev because we believe security tools should be fast,
-              clear, and designed for the people who write code — not just the
-              people who audit it.
+              We built SafeDev because security tools should be fast, clear, and
+              actually useful for the people writing code.
             </motion.p>
           </motion.div>
         </div>
@@ -212,22 +211,21 @@ export default function AboutPage() {
               className="mt-8 space-y-6 text-lg leading-8 text-white/70"
             >
               <p>
-                We&apos;ve all been there: a leaked API key in a commit history,
-                a JWT with no expiration, a secret accidentally pushed to a
-                public repo. These mistakes are easy to make and painful to fix.
+                We&apos;ve all been there. A leaked API key in a commit history.
+                A JWT that never expires. A secret that accidentally ended up in
+                a public repo. Easy mistakes to make, painful to fix.
               </p>
               <p>
-                Most security tools are built for security teams — complex
-                dashboards, overwhelming alerts, and reports that require a PhD
-                to understand. Developers are left piecing together context from
+                Most security tools are built for security teams. Complex
+                dashboards, overwhelming alerts, reports you need a PhD to
+                understand. Developers end up piecing together context from
                 scattered tools and generic advice.
               </p>
               <p>
                 <strong className="text-white">SafeDev is different.</strong>{" "}
-                We built it from the ground up for developers who want to ship
-                secure code without becoming full-time security engineers.
-                Real-time scanning, clear explanations, and actionable fixes —
-                all designed to fit into your existing workflow.
+                We built it for developers who want to ship secure code without
+                becoming full-time security engineers. Real-time scanning, clear
+                explanations, and fixes you can actually use.
               </p>
             </motion.div>
           </motion.div>
@@ -254,35 +252,35 @@ export default function AboutPage() {
               variants={fadeUp}
               className="text-center text-3xl font-bold text-white md:text-4xl"
             >
-              Tools to secure your code
+              What we build
             </motion.h2>
 
             <motion.p
               variants={fadeUp}
               className="mx-auto mt-4 max-w-2xl text-center text-white/65"
             >
-              Explore our suite of security tools designed for modern developers.
+              Three tools to help you find and fix security issues.
             </motion.p>
 
             <div className="mt-12 grid gap-6 md:grid-cols-3">
               <FeatureCard
                 icon={ScanSearch}
                 title="GitHub Scanner"
-                description="Detect hardcoded secrets, API keys, and risky patterns across your repositories with real-time streaming results."
+                description="Find hardcoded secrets, API keys, and risky patterns in your repos. Results stream in as we scan."
                 href="/features/github-scanner"
               />
 
               <FeatureCard
                 icon={KeyRound}
                 title="JWT Inspector"
-                description="Decode, validate, and analyze JWTs for expiry issues, weak algorithms, and claim vulnerabilities."
+                description="Decode and validate JWTs. Check for expiry issues, weak algorithms, and sketchy claims."
                 href="/features/jwt-inspector"
               />
 
               <FeatureCard
                 icon={ShieldCheck}
                 title="Security Advisor"
-                description="Get a clear security score with prioritized remediation steps tailored to your codebase."
+                description="Get a security score and a prioritized list of what to fix first."
                 href="/features/security-advisor"
               />
             </div>
@@ -310,14 +308,14 @@ export default function AboutPage() {
               variants={fadeUp}
               className="text-center text-3xl font-bold text-white md:text-4xl"
             >
-              What we believe in
+              What we care about
             </motion.h2>
 
             <motion.p
               variants={fadeUp}
               className="mx-auto mt-4 max-w-2xl text-center text-white/65"
             >
-              These principles guide everything we build at SafeDev.
+              The stuff that shapes how we build SafeDev.
             </motion.p>
 
             <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -373,26 +371,26 @@ export default function AboutPage() {
               variants={fadeUp}
               className="mx-auto mt-4 max-w-2xl text-center text-white/65"
             >
-              We don&apos;t just find problems — we help you understand and fix
+              We don&apos;t just find problems. We help you understand and fix
               them.
             </motion.p>
 
             <div className="mt-12 space-y-8">
               <PrincipleItem
                 title="Actionable over comprehensive"
-                description="We focus on issues you can actually fix, prioritized by real-world impact. No noise, no false positives drowning out real risks."
+                description="We focus on issues you can actually fix, ranked by real impact. No noise, no false positives drowning out real risks."
               />
               <PrincipleItem
                 title="Context, not just alerts"
-                description="Every finding comes with explanation: what it means, why it matters, and exactly how to fix it. No cryptic error codes or generic advice."
+                description="Every finding comes with an explanation: what it means, why it matters, and how to fix it. No cryptic error codes."
               />
               <PrincipleItem
-                title="Shift left, but realistically"
-                description="Catch issues early without breaking your flow. We integrate where you already work — your IDE, your CI, your GitHub workflow."
+                title="Shift left, but be realistic"
+                description="Catch issues early without breaking your flow. We plug into where you already work: your IDE, your CI, your GitHub."
               />
               <PrincipleItem
-                title="Continuous improvement"
-                description="Security isn't a checkbox. Track your progress, measure improvements, and build better habits over time."
+                title="Keep improving"
+                description="Security isn't a one-time thing. Track your progress, measure improvements, and build better habits over time."
               />
             </div>
           </motion.div>
