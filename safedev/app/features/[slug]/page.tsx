@@ -17,6 +17,7 @@ type FeatureData = {
   works: { title: string; desc: string; iconName: "sparkles" | "git" | "scan" | "badge" | "check" | "shield" }[];
   outputs: { label: string; value: string }[];
   cta: { title: string; desc: string };
+  ctaLink: string;
   next: FeatureKey;
   prev: FeatureKey;
 };
@@ -46,6 +47,7 @@ const FEATURES: Record<FeatureKey, FeatureData> = {
       { label: "Recommendations", value: "Prioritized fix list" },
     ],
     cta: { title: "Secure tokens in minutes", desc: "Join the waitlist to get SafeDev early access and launch updates." },
+    ctaLink: process.env.NEXT_PUBLIC_JWT_EXTENSION_URL || "/github",
     next: "github-scanner",
     prev: "security-advisor",
     details: {
@@ -113,6 +115,7 @@ const FEATURES: Record<FeatureKey, FeatureData> = {
       { label: "Remediation", value: "Step-by-step guidance" },
     ],
     cta: { title: "Protect your repos proactively", desc: "Join the waitlist to scan with SafeDev as soon as it launches." },
+    ctaLink: "/github",
     next: "security-advisor",
     prev: "jwt-inspector",
     details: {
@@ -180,6 +183,7 @@ const FEATURES: Record<FeatureKey, FeatureData> = {
       { label: "Next Steps", value: "Action plan checklist" },
     ],
     cta: { title: "Get a security plan you can execute", desc: "Join the waitlist and get SafeDev early access." },
+    ctaLink: "/github",
     next: "jwt-inspector",
     prev: "github-scanner",
     details: {

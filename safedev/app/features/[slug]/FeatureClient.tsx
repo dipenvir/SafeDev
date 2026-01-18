@@ -46,6 +46,7 @@ type FeatureData = {
     outputs: { label: string; value: string }[];
     details: { intro: string; sections: { title: string; points: string[] }[] };
     cta: { title: string; desc: string };
+    ctaLink: string;
     next: FeatureKey;
     prev: FeatureKey;
 };
@@ -237,7 +238,7 @@ export default function FeatureClient({
 
                         <motion.div variants={fadeUp} className="mt-10 flex flex-col gap-3 sm:flex-row">
                             <motion.a
-                                href="/github"
+                                href={feature.ctaLink}
                                 className="group inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-[#070A12] shadow-lg shadow-indigo-500/10 transition hover:bg-white/90"
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}

@@ -12,6 +12,15 @@
     "default_title": "JWT Inspector",
     "default_popup": "popup.html"
   },
+  "browser_specific_settings": {
+    "gecko": {
+      "data_collection_permissions": {
+        "id": "jwt-extension@safedev",
+        "required": ["websiteContent"],
+        "optional": []
+      }
+    }
+  },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
