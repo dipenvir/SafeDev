@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>JWT Demo App</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      padding: 40px;
+    }
+    .card {
+      max-width: 700px;
+      margin: auto;
+      background: #020617;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 0 0 1px #1e293b;
+    }
+    code {
+      display: block;
+      background: #020617;
+      padding: 12px;
+      border-radius: 8px;
+      word-break: break-all;
+      color: #38bdf8;
+    }
+    button {
+      margin-top: 16px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: none;
+      background: #6366f1;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🔐 JWT Demo Application</h1>
+    <p>This site stores a valid JWT in <strong>localStorage</strong> and <strong>cookies</strong>.</p>
+
+    <h3>Access Token</h3>
+    <code id="token"></code>
+
+    <button onclick="storeToken()">Store Token</button>
+  </div>
+
+  <script>
+    const jwt = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+.eyJpc3MiOiJodHRwczovL2RlbW8tYXV0aC5kZXZzZWN0b29sa2l0LmlvIiwiYXVkIjoiZGV2c2VjLWRlbW8tYXBwIiwic3ViIjoidXNlcl8xMjM0NSIsImVtYWlsIjoiZGVtb0BzZWN1cml0eS5kZXYiLCJyb2xlIjoiZGV2ZWxvcGVyIiwiaWF0IjoxNzE2MjIwMDAwLCJuYmYiOjE3MTYyMjAwMDAsImV4cCI6MTg5MzQ1NjAwMH0
+.ZXhhbXBsZS1zaWduYXR1cmU`.replace(/\s+/g, '');
+
+    document.getElementById("token").textContent = jwt;
+
+    function storeToken() {
+      localStorage.setItem("access_token", jwt);
+      document.cookie = `access_token=${jwt}; path=/`;
+      alert("JWT stored! Now scan this site using your extension 🚀");
+    }
+  </script>
+</body>
+</html>
