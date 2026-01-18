@@ -256,33 +256,33 @@ export default function FeatureClient({
             </section>
 
             {/* CTA + NAV */}
-            <section className="bg-gray-50 py-20">
+            <section className="bg-[#070A12] py-20">
                 <div className="mx-auto max-w-4xl px-6">
                     <motion.div
                         initial={{ opacity: 0, y: 18 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, amount: 0.2 }}
                         transition={{ duration: 0.6, ease: EASE_OUT }}
-                        className="relative overflow-hidden rounded-3xl border border-gray-200 bg-white p-10 text-center shadow-sm"
+                        className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/4 p-10 text-center backdrop-blur"
                     >
-                        <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-indigo-200/50 blur-3xl" />
-                        <div className="pointer-events-none absolute -left-20 -bottom-20 h-72 w-72 rounded-full bg-fuchsia-200/40 blur-3xl" />
+                        <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-indigo-500/20 blur-3xl" />
+                        <div className="pointer-events-none absolute -left-20 -bottom-20 h-72 w-72 rounded-full bg-fuchsia-500/20 blur-3xl" />
 
                         <div className="relative">
-                            <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">{feature.cta.title}</h2>
-                            <p className="mx-auto mt-3 max-w-2xl text-gray-600">{feature.cta.desc}</p>
+                            <h2 className="text-3xl font-bold text-white md:text-4xl">{feature.cta.title}</h2>
+                            <p className="mx-auto mt-3 max-w-2xl text-white/70">{feature.cta.desc}</p>
 
                             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                                 <Link
-                                    href="/about#signup"
-                                    className="inline-flex h-12 items-center justify-center rounded-xl bg-indigo-600 px-6 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-200"
+                                    href="/github"
+                                    className="inline-flex h-12 items-center justify-center rounded-xl bg-white px-6 text-sm font-semibold text-[#070A12] shadow-lg shadow-indigo-500/10 transition hover:bg-white/90"
                                 >
-                                    Join Waitlist
+                                    Get Started
                                 </Link>
 
                                 <Link
-                                    href="/about#features"
-                                    className="inline-flex h-12 items-center justify-center rounded-xl border border-gray-300 bg-white px-6 text-sm font-semibold text-gray-900 transition hover:bg-gray-50"
+                                    href="/about"
+                                    className="inline-flex h-12 items-center justify-center rounded-xl border border-white/15 bg-white/5 px-6 text-sm font-semibold text-white/80 backdrop-blur transition hover:bg-white/8"
                                 >
                                     Explore all features
                                 </Link>
@@ -291,24 +291,24 @@ export default function FeatureClient({
                             <div className="mt-10 grid gap-3 sm:grid-cols-2">
                                 <Link
                                     href={`/features/${prev.slug}`}
-                                    className="group flex items-center justify-between rounded-2xl border border-gray-200 bg-white p-5 text-left transition hover:bg-gray-50"
+                                    className="group flex items-center justify-between rounded-2xl border border-white/10 bg-white/4 p-5 text-left backdrop-blur transition hover:bg-white/8"
                                 >
                                     <div>
-                                        <div className="text-xs font-semibold text-gray-500">Previous</div>
-                                        <div className="mt-1 text-base font-semibold text-gray-900">{prev.name}</div>
+                                        <div className="text-xs font-semibold text-white/50">Previous</div>
+                                        <div className="mt-1 text-base font-semibold text-white">{prev.name}</div>
                                     </div>
-                                    <ArrowLeft className="h-5 w-5 text-gray-500 transition group-hover:-translate-x-0.5" />
+                                    <ArrowLeft className="h-5 w-5 text-white/50 transition group-hover:-translate-x-0.5" />
                                 </Link>
 
                                 <Link
                                     href={`/features/${next.slug}`}
-                                    className="group flex items-center justify-between rounded-2xl border border-gray-200 bg-white p-5 text-left transition hover:bg-gray-50"
+                                    className="group flex items-center justify-between rounded-2xl border border-white/10 bg-white/4 p-5 text-left backdrop-blur transition hover:bg-white/8"
                                 >
                                     <div>
-                                        <div className="text-xs font-semibold text-gray-500">Next</div>
-                                        <div className="mt-1 text-base font-semibold text-gray-900">{next.name}</div>
+                                        <div className="text-xs font-semibold text-white/50">Next</div>
+                                        <div className="mt-1 text-base font-semibold text-white">{next.name}</div>
                                     </div>
-                                    <ArrowRight className="h-5 w-5 text-gray-500 transition group-hover:translate-x-0.5" />
+                                    <ArrowRight className="h-5 w-5 text-white/50 transition group-hover:translate-x-0.5" />
                                 </Link>
                             </div>
                         </div>
