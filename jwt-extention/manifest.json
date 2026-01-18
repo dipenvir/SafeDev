@@ -1,0 +1,23 @@
+{
+  "manifest_version": 2,
+  "name": "SafeDev JWT Inspector",
+  "version": "1.0.0",
+  "description": "Scan cookies + storage for JWT/JWE and analyze security risks.",
+  "permissions": [
+    "tabs",
+    "cookies",
+    "<all_urls>"
+  ],
+  "browser_action": {
+    "default_title": "JWT Inspector",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ]
+}
